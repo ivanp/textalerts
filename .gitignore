@@ -1,3 +1,6 @@
 /assets
 /protected/runtime
 /protected/tests
+/protected/data
+/protected/yiic
+*~
