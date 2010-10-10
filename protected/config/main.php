@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'My Web Application',
+	'name'=>'Lakewood Parks Youth Alerts',
 
 	// preloading 'log' component
 	'preload'=>array('log'),
@@ -19,13 +19,12 @@ return array(
 	),
 
 	'modules'=>array(
+		'admin'=>array(),
 		// uncomment the following to enable the Gii tool
-		/*
 		'gii'=>array(
 			'class'=>'system.gii.GiiModule',
-			'password'=>'Enter Your Password Here',
+			'password'=>'kucingmiaw',
 		),
-		*/
 	),
 
 	// application components
@@ -33,20 +32,28 @@ return array(
 		'user'=>array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
+			'loginUrl' => array('user/login')
 		),
 		// uncomment the following to enable URLs in path-format
-		/*
 		'urlManager'=>array(
+			'showScriptName' => false, // remove index.php in URL
 			'urlFormat'=>'path',
 			'rules'=>array(
+				'site/subscribe/<type:\w+>/<group_id:\d+>'=>'site/subscribe',
+				'site/unsubscribe/<type:\w+>/<group_id:\d+>'=>'site/unsubscribe',
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),
-		*/
 		'db'=>array(
-			'connectionString' => 'sqlite:'.dirname(__FILE__).'/../data/testdrive.db',
+//			'connectionString' => 'sqlite:'.dirname(__FILE__).'/../data/testdrive.db',
+//			'connectionString' => 'mysql://pfredt:2A2enevuV@localhost:8889/pfredt',
+			'connectionString' => 'mysql:host=localhost;dbname=pfredt',
+			'emulatePrepare' => true,
+			'username' => 'pfredt',
+			'password' => '2A2enevuV',
+			'charset' => 'utf8',
 		),
 		// uncomment the following to use a MySQL database
 		/*
@@ -83,6 +90,8 @@ return array(
 	// using Yii::app()->params['paramName']
 	'params'=>array(
 		// this is used in contact page
-		'adminEmail'=>'webmaster@example.com',
+		'adminEmail'=>'ivan@primaguna.com',
+		'mainHost'=>'textalert.com'
 	),
+
 );

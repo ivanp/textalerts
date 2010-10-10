@@ -2,6 +2,7 @@
 
 class SiteController extends Controller
 {
+//	public $layout='//layouts/column2';
 	/**
 	 * Declares class-based actions.
 	 */
@@ -66,38 +67,118 @@ class SiteController extends Controller
 		$this->render('contact',array('model'=>$model));
 	}
 
-	/**
-	 * Displays the login page
-	 */
-	public function actionLogin()
+	public function actionDashboard()
 	{
-		$model=new LoginForm;
+		$this->layout='//layouts/column2';
+		$user = User::getLoggedUser();
+		$this->render('dashboard', array(
+			'user' => $user,
+			'mail_alerts'	=> $user->mail_alerts,
+			'text_alerts' => $user->text_alerts,
+			'avail_mail_alerts' => Group::getAvailableMessageGroups(),
+			'avail_text_alerts' => Group::getAvailableTextGroups()
+		));
+	}
 
-		// if it is ajax validation request
-		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
-		{
-			echo CActiveForm::validate($model);
+	public function actionSubscribe($type, $group_id)
+	{
+		switch ($type) {
+			case 'mail':
+				$table = 'message_groups_subscribers';
+				break;
+			case 'text':
+				$table = 'text_group_subscribers';
+				break;
+			default:
+				throw new CHttpException(400, 'Incorrect type given.');
+		}
+		$group = Group::model()->findByPk($group_id);
+		if ($group===null) {
+			throw new CHttpException(404, 'Group #'.$group_id.' does not exist in database.');
+		}
+
+		$user = User::getLoggedUser();
+		$user_id = $user->subscriber_id;
+		$conn = Yii::app()->db;
+		$cmd = $conn->createCommand('select * from '.$table.' where message_group_id = :group_id and subscriber_id = :user_id');
+		$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+		$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+		$row = $cmd->queryRow();
+		
+		if (!$row) {
+			$cmd = $conn->createCommand('insert into '.$table.' (message_group_id, subscriber_id) values (:group_id, :user_id)');
+			$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+			$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+			$cmd->execute();
+
+			$group = Group::model()->findByPk($group_id);
+			echo $this->renderPartial('_group_row',array(
+					'group'=>$group,
+					'type' =>$type
+				), true);
+			echo $this->renderPartial('_add_group',array(
+					'group'=>$group,
+					'type' =>$type
+				), true);
 			Yii::app()->end();
 		}
+	}
 
-		// collect user input data
-		if(isset($_POST['LoginForm']))
-		{
-			$model->attributes=$_POST['LoginForm'];
-			// validate user input and redirect to the previous page if valid
-			if($model->validate() && $model->login())
-				$this->redirect(Yii::app()->user->returnUrl);
+	public function actionUnsubscribe($type, $group_id) {
+		switch ($type) {
+			case 'mail':
+				$table = 'message_groups_subscribers';
+				break;
+			case 'text':
+				$table = 'text_group_subscribers';
+				break;
+			default:
+				throw new CHttpException(400, 'Incorrect type given.');
 		}
-		// display the login form
-		$this->render('login',array('model'=>$model));
+
+		$user = User::getLoggedUser();
+		$user_id = $user->subscriber_id;
+		$conn = Yii::app()->db;
+
+		$cmd = $conn->createCommand('select * from '.$table.' where message_group_id = :group_id and subscriber_id = :user_id');
+		$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+		$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+		$row = $cmd->queryRow();
+
+		if ($row) {
+			$cmd = $conn->createCommand('delete from '.$table.' where message_group_id = :group_id and subscriber_id = :user_id');
+			$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+			$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+			$rows = $cmd->execute();
+
+			$group = Group::model()->findByPk($group_id);
+			echo $this->renderPartial('_add_group',array(
+					'group'=>$group,
+					'type' =>$type
+				), true);
+			Yii::app()->end();
+		}
 	}
 
-	/**
-	 * Logs out the current user and redirect to homepage.
-	 */
-	public function actionLogout()
+	public function filters()
 	{
-		Yii::app()->user->logout();
-		$this->redirect(Yii::app()->homeUrl);
+		return array(
+				'accessControl',
+		);
 	}
+
+	public function accessRules()
+	{
+		return array(
+				array('allow',
+						'actions'=>array('dashboard', 'subscribe', 'unsubscribe'),
+						'users'=>array('@'),
+				),
+				array('deny',
+						'actions'=>array('dashboard', 'subscribe', 'unsubscribe'),
+						'users'=>array('*'),
+				),
+		);
+	}
+
 }

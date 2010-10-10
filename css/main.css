@@ -227,3 +227,19 @@ div.search-form
 {
 	background: #80CFFF;
 }
+
+.add_info {
+	font-size: 80%;
+}
+
+.center {
+	text-align: center;
+}
+
+.right {
+	text-align: right;
+}
+
+.left {
+	text-align: left;
+}
