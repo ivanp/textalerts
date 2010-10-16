@@ -38,13 +38,6 @@ return array(
 		'urlManager'=>array(
 			'showScriptName' => false, // remove index.php in URL
 			'urlFormat'=>'path',
-			'rules'=>array(
-				'site/subscribe/<type:\w+>/<group_id:\d+>'=>'site/subscribe',
-				'site/unsubscribe/<type:\w+>/<group_id:\d+>'=>'site/unsubscribe',
-				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
-				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
-				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
-			),
 		),
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=textalerts',
@@ -54,15 +47,6 @@ return array(
 			'charset' => 'utf8',
 		),
 		// uncomment the following to use a MySQL database
-		/*
-		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=testdrive',
-			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => '',
-			'charset' => 'utf8',
-		),
-		*/
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
             'errorAction'=>'site/error',
