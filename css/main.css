@@ -50,9 +50,13 @@ body
 #mainmenu
 {
 	background:white url(bg.gif) repeat-x left top;
+	width: 100%;
+	clear: both;
+	display:block;
+	height: 33px;
 }
 
-#mainmenu ul
+/*#mainmenu ul
 {
 	padding:6px 20px 5px 20px;
 	margin:0px;
@@ -78,7 +82,7 @@ body
 	color: #6399cd;
 	background-color:#EFF4FA;
 	text-decoration:none;
-}
+}*/
 
 div.flash-error, div.flash-notice, div.flash-success
 {

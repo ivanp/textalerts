@@ -21,7 +21,7 @@ class User extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'subscribers';
+		return 'user';
 	}
 
 	/**
@@ -49,9 +49,7 @@ class User extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'phone' => array(self::HAS_ONE, 'PhoneNumber', 'subscriber_id'),
-			'mail_alerts' => array(self::MANY_MANY, 'Group', 'message_groups_subscribers(subscriber_id, message_group_id)'),
-			'text_alerts' => array(self::MANY_MANY, 'Group', 'text_group_subscribers(subscriber_id, message_group_id)')
+			'phone' => array(self::HAS_ONE, 'PhoneNumber', 'user_id'),
 		);
 	}
 
@@ -85,7 +83,7 @@ class User extends CActiveRecord
 
 	public function primaryKey()
 	{
-		return 'subscriber_id';
+		return 'id';
 	}
 	
 	/**
@@ -100,6 +98,7 @@ class User extends CActiveRecord
 			{
 				$this->password = $this->hashPassword($this->password);
 			}
+			$this->created = date('Y-m-d H:i:s');
 			return true;
 		}
 		else
@@ -134,5 +133,10 @@ class User extends CActiveRecord
 		} else {
 			return null;
 		}
+	}
+
+	public function isAdmin()
+	{
+		return (bool)$this->admin;
 	}
 }

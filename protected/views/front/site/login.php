@@ -41,5 +41,5 @@ $this->breadcrumbs=array(
 
 <?php $this->endWidget(); ?>
 
-	<p><a href="<?php  ?>">Click here to signup.</a></p>
+	<p><a href="<?php echo $this->signupUrl ?>">Click here to signup.</a></p>
 </div><!-- form -->

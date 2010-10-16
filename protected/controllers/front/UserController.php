@@ -52,8 +52,8 @@ class UserController extends Controller {
 				$content = $this->renderPartial('register_email',array(
 					'model'=>$model,
 					'password'=>$password,
-					'loginUrl' => $this->createUrl('user/login'),
-					'resetPwdUrl' => $this->createUrl('user/forgot_password')
+					'loginUrl' => $this->createAbsoluteUrl('user/login'),
+					'resetPwdUrl' => $this->createAbsoluteUrl('user/forgot_password')
 				), true);
 
 				// Send e-mail
@@ -70,6 +70,7 @@ class UserController extends Controller {
 
 		$this->render('register',array(
 			'model'=>$model,
+			'signupUrl' => $this->createUrl('user/register')
 		));
 	}
 
@@ -82,4 +83,10 @@ class UserController extends Controller {
 	{
 		
 	}
+
+	public function actionPassword()
+	{
+		$this->render('password');
+	}
+
 }

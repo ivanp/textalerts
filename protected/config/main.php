@@ -47,9 +47,7 @@ return array(
 			),
 		),
 		'db'=>array(
-//			'connectionString' => 'sqlite:'.dirname(__FILE__).'/../data/testdrive.db',
-//			'connectionString' => 'mysql://pfredt:2A2enevuV@localhost:8889/pfredt',
-			'connectionString' => 'mysql:host=localhost;dbname=pfredt',
+			'connectionString' => 'mysql:host=localhost;dbname=textalerts',
 			'emulatePrepare' => true,
 			'username' => 'pfredt',
 			'password' => '2A2enevuV',
@@ -84,6 +82,9 @@ return array(
 				*/
 			),
 		),
+		'session' => array(
+			'cookieParams' => array('domain' => '.textalert.local')
+		)
 	),
 
 	// application-level parameters that can be accessed
@@ -94,4 +95,9 @@ return array(
 		'mainHost'=>'textalert.com'
 	),
 
+	'behaviors'=>array(
+		'runEnd'=>array(
+			'class'=>'application.components.WebApplicationEndBehavior',
+		),
+	),
 );

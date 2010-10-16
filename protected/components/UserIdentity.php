@@ -26,7 +26,7 @@ class UserIdentity extends CUserIdentity
 			$this->errorCode=self::ERROR_PASSWORD_INVALID;
 		else {
 			$this->errorCode=self::ERROR_NONE;
-			$this->_id = $user->subscriber_id;
+			$this->_id = $user->id;
 			$this->setState('record', $user);
 		}
 		return !$this->errorCode;
