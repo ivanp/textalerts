@@ -3,7 +3,7 @@ define('HOSTNAME_MAIN', 'textalert.local');
 define('HOSTNAME_ADMIN', 'admin.textalert.local');
 
 // Yii main script
-$yii=dirname(__FILE__).'/../yii-1.1.4.r2429/framework/yii.php';
+$yii=dirname(__FILE__).'/../yii/yii.php';
 
 switch ($_SERVER['SERVER_NAME'])
 {

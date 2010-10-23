@@ -247,3 +247,36 @@ div.search-form
 .left {
 	text-align: left;
 }
+
+#loginbox {
+
+}
+
+#loginbox label {
+	clear: both;
+	display: block;
+}
+
+#loginbox .login-input-row {
+	clear: both;
+	display: block;
+	margin-bottom: 8px;
+}
+
+#loginbox .login-input-button {
+	clear: both;
+	display: block;
+	margin-bottom: 4px;
+}
+
+#loginbox .login-links {
+
+}
+
+h2.fc-header-title {
+	font-size: 16px;
+}
+
+div#content {
+	font-size: 12pt;
+}

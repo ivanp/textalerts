@@ -238,7 +238,7 @@ li ol, li ul {
 	font-weight: bold;
 	text-transform: uppercase;
 	font-family: 'Lucida Grande','Lucida Sans Unicode',Geneva,Verdana,Sans-Serif;
-	padding: 0 20px;
+	padding: 0 10px;
 	text-decoration: none;
 }
 
@@ -257,13 +257,21 @@ li ol, li ul {
 
 #content {
 	float: left;
-	width: 615px;
+	
 	margin: 0;
 	padding: 10px;
 	background-color: #fff;
 	border: 1px solid #ccc;
 	border-right-color: #c0c0c0;
 	border-bottom-color: #c0c0c0;
+}
+
+.colmain {
+	width: 912px;
+}
+
+.colleft {
+	width: 615px;
 }
 
 .sidebar {
