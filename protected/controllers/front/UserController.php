@@ -3,7 +3,7 @@
 Yii::import('application.vendors.*');
 require_once('Zend/Mail.php');
 
-class UserController extends Controller {
+class UserController extends CFrontController {
 	public function actionLogin()
 	{
 		$model=new LoginForm;
@@ -74,11 +74,6 @@ class UserController extends Controller {
 		));
 	}
 
-	public function actionDashboard()
-	{
-
-	}
-
 	public function actionForgotPassword()
 	{
 		
@@ -87,6 +82,18 @@ class UserController extends Controller {
 	public function actionPassword()
 	{
 		$this->render('password');
+	}
+
+	public function actionPhone()
+	{
+		echo 'setting phone number here';
+	}
+
+	public function actionProfile()
+	{
+		$this->render('profile', array(
+			'user' => Yii::app()->user->record
+		));
 	}
 
 }

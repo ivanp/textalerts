@@ -5,7 +5,7 @@
  *
  * @author ivan
  */
-class GroupController extends Controller
+class GroupController extends CFrontController
 {
 	public function actionIndex()
 	{

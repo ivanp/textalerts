@@ -6,7 +6,16 @@ abstract class CompanyActiveRecord extends CActiveRecord
 	 *
 	 * @var Company
 	 */
-	private $_company;
+	public $company;
+	
+	static public $_static_company;
+
+	public function __construct($scenario='insert')
+	{
+		if (self::$_static_company instanceof Company)
+			$this->company = self::$_static_company;
+		parent::__construct($scenario);
+	}
 
 
 	/**
@@ -25,15 +34,19 @@ abstract class CompanyActiveRecord extends CActiveRecord
 	 */
 	public static function modelByCompany(Company $company, $className = __CLASS__)
 	{
-		$companyClassName = $className.'_'.$company->id;
-		if (!class_exists($companyClassName, false))
-		{
-			$tableName = static::tableNameByCompany($company, static::baseTableName());
-			$php = "class $companyClassName extends $className { public function tableName() { return '$tableName'; } }";
-			eval($php);
-		}
-		$model = parent::model($companyClassName);
-		$model->_company = $company;
+		if (isset($company->id)) { // check if it's loaded
+			$companyClassName = $className.'_'.$company->id;
+			if (!class_exists($companyClassName, false))
+			{
+				$tableName = static::tableNameByCompany($company, static::baseTableName());
+				$php = "class $companyClassName extends $className { public function tableName() { return '$tableName'; } }";
+				eval($php);
+				$companyClassName::$_static_company = $company;
+			}
+			$model = parent::model($companyClassName);
+		} else
+			$model = parent::model($className);
+//		$model->company = $company;
 		return $model;
 	}
 
@@ -48,13 +61,8 @@ abstract class CompanyActiveRecord extends CActiveRecord
 		$model = static::modelByCompany($company);
 		$className = get_class($model);
 		$object = new $className;
-		$object->_company = $company;
+		$object->company = $company;
 		return $object;
-	}
-
-	public function getCompany()
-	{
-		return $this->_company;
 	}
 
 	/**
@@ -69,4 +77,12 @@ abstract class CompanyActiveRecord extends CActiveRecord
 		return $company->id.'_'.$tableName;
 	}
 
+	public function tableName()
+	{
+		if ($this->company instanceof Company)
+			$tblName = static::tableNameByCompany($this->company, static::baseTableName());
+		else
+			$tblName = static::baseTableName();
+		return $tblName;
+	}
 }

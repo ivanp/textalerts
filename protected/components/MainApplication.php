@@ -7,30 +7,28 @@
  */
 class MainApplication extends CWebApplication {
 
-	/**
-	 *
-	 * @var Company
-	 */
-	private $_company = null;
-
     //put your code here
-	static public function create($config) {
+	static public function create($config)
+	{
 		return Yii::createApplication('MainApplication',$config);
 	}
 
-	public function getCompany() {
-		return $this->_company;
-	}
-
-	public function isCompanySelected() {
-		return ($this->_company instanceof Company);
-	}
-
-	public function init() {
+	public function init()
+	{
 		parent::init();
-		$company = Company::model()->find('host = :host', array(':host' => $_SERVER['SERVER_NAME']));
-		if ($company instanceof Company) {
-			$this->_company = $company;
+		if (CONTROLLER_MODE!='admin')
+		{
+			$this->getUser()->loginUrl = $this->createFrontUrl('user/login');
 		}
+	}
+
+	public function createFrontUrl($route,$params=array(),$ampersand='&')
+	{
+		return 'http://'.Yii::app()->params['domain'].$this->createUrl($route, $params, $ampersand);
+	}
+
+	public function createCompanyUrl(Company $company,$route,$params=array(),$ampersand='&')
+	{
+		return 'http://'.$company->host.'.'.Yii::app()->params['domain'].$this->createUrl($route, $params, $ampersand);
 	}
 }

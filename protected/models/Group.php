@@ -49,45 +49,45 @@ ENGINE = MyISAM";
 	}
 
 
-	static public function getAvailableMessageGroups($user = null) {
-		if (!($user instanceof User)) {
-			$user = User::getLoggedUser();
-		}
-
-		$mail_alerts = $user->mail_alerts;
-		$ids = array();
-		foreach ($mail_alerts as $row) {
-			$ids[] = $row->message_group_id;
-		}
-
-		if (count($ids)) {
-			$conn = Yii::app()->db;
-			$groups = Group::model()->findAll('message_group_id NOT IN ('.join(',', $ids).')');
-		} else {
-			$groups = Group::model()->findAll();
-		}
-		return $groups;
-	}
-
-	static public function getAvailableTextGroups($user = null) {
-		if (!($user instanceof User)) {
-			$user = User::getLoggedUser();
-		}
-
-		$text_alerts = $user->text_alerts;
-		$ids = array();
-		foreach ($text_alerts as $row) {
-			$ids[] = $row->message_group_id;
-		}
-
-		if (count($ids)) {
-			$conn = Yii::app()->db;
-			$groups = Group::model()->findAll('message_group_id NOT IN ('.join(',', $ids).')');
-		} else {
-			$groups = Group::model()->findAll();
-		}
-		return $groups;
-	}
+//	static public function getAvailableMessageGroups($user = null) {
+//		if (!($user instanceof User)) {
+//			$user = User::getLoggedUser();
+//		}
+//
+//		$mail_alerts = $user->mail_alerts;
+//		$ids = array();
+//		foreach ($mail_alerts as $row) {
+//			$ids[] = $row->message_group_id;
+//		}
+//
+//		if (count($ids)) {
+//			$conn = Yii::app()->db;
+//			$groups = Group::model()->findAll('message_group_id NOT IN ('.join(',', $ids).')');
+//		} else {
+//			$groups = Group::model()->findAll();
+//		}
+//		return $groups;
+//	}
+//
+//	static public function getAvailableTextGroups($user = null) {
+//		if (!($user instanceof User)) {
+//			$user = User::getLoggedUser();
+//		}
+//
+//		$text_alerts = $user->text_alerts;
+//		$ids = array();
+//		foreach ($text_alerts as $row) {
+//			$ids[] = $row->message_group_id;
+//		}
+//
+//		if (count($ids)) {
+//			$conn = Yii::app()->db;
+//			$groups = Group::model()->findAll('message_group_id NOT IN ('.join(',', $ids).')');
+//		} else {
+//			$groups = Group::model()->findAll();
+//		}
+//		return $groups;
+//	}
 
 	/**
 	 * @return array customized attribute labels (name=>label)
@@ -116,6 +116,47 @@ ENGINE = MyISAM";
 
 	public function primaryKey()
 	{
-		return 'message_group_id';
+		return 'id';
 	}
+
+	public function createViewUrl()
+	{
+		return Yii::app()->createCompanyUrl($this->company, 'group/view', array('id'=>$this->id));
+	}
+
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		$subscription_model = Subscription::modelByCompany($this->company);
+		return array(
+			'subscribers' => array(self::HAS_MANY, get_class($subscription_model), 'group_id')
+		);
+	}
+
+	public function getUsers()
+	{
+	  //User::model()->findAl
+	}
+
+//	public function __get($name)
+//	{
+//		if ($name=='subscribers')
+//			return Subscription::modelByCompany($this->company)->findAll();
+//		else
+//			return parent::__get($name);
+//	}
+//
+//	public function __call($name,$parameters)
+//	{
+//		if ($name=='subscribers')
+//		{
+//			$condition = isset($parameters[0]['condition'])
+//				? $parameters[0]['condition']
+//				: '';
+//			return Subscription::modelByCompany($this->company)->findAll($condition, $parameters[0]);
+//		}
+//		else
+//			return parent::__call($name, $parameters);
+//	}
 }

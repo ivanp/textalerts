@@ -1,12 +1,13 @@
 <?php
-switch ($type) {
-	case 'mail':
-		$groups = Group::getAvailableMessageGroups();
-		break;
-	case 'text':
-		$groups = Group::getAvailableTextGroups();
-		break;
-}
+//switch ($type) {
+//	case 'mail':
+//		$groups = Group::getAvailableMessageGroups();
+//		break;
+//	case 'text':
+//		$groups = Group::getAvailableTextGroups();
+//		break;
+//}
+$groups = array();
 ?>
 	<tr class="group_add">
 		<td colspan="2">

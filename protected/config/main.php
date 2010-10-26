@@ -7,7 +7,7 @@
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'Lakewood Parks Youth Alerts',
+	'name'=>'TextAlerts.com', // this thing must be the same across domains (cookie related)
 
 	// preloading 'log' component
 	'preload'=>array('log'),
@@ -16,6 +16,9 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
+		'application.models.forms.*'
+//		'application.modules.srbac.controllers.SBaseController',
+//		'application.modules.srbac.*'
 	),
 
 	'modules'=>array(
@@ -25,26 +28,36 @@ return array(
 			'class'=>'system.gii.GiiModule',
 			'password'=>'kucingmiaw',
 		),
+		
 	),
 
 	// application components
 	'components'=>array(
-		'user'=>array(
-			// enable cookie-based authentication
-			'allowAutoLogin'=>true,
-			'loginUrl' => array('user/login')
-		),
-		// uncomment the following to enable URLs in path-format
-		'urlManager'=>array(
-			'showScriptName' => false, // remove index.php in URL
-			'urlFormat'=>'path',
-		),
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=textalerts',
 			'emulatePrepare' => true,
 			'username' => 'pfredt',
 			'password' => '2A2enevuV',
 			'charset' => 'utf8',
+		),
+		'authManager'=>array(
+//			'class'=>'application.modules.srbac.components.SDbAuthManager',
+			'class'=>'CDbAuthManager',
+			'connectionID'=>'db',
+			'itemTable'=>'auth_item',
+			'itemChildTable'=>'auth_itemchild',
+			'assignmentTable'=>'auth_assignment',
+			'defaultRoles'=>array('Authenticated', 'Guest')
+		),
+		'user'=>array(
+			// enable cookie-based authentication
+			'allowAutoLogin'=>true,
+			'loginUrl' => 'http://textalert.local/user/login'
+		),
+		// uncomment the following to enable URLs in path-format
+		'urlManager'=>array(
+			'showScriptName' => false, // remove index.php in URL
+			'urlFormat'=>'path',
 		),
 		// uncomment the following to use a MySQL database
 		'errorHandler'=>array(
@@ -59,11 +72,9 @@ return array(
 					'levels'=>'error, warning',
 				),
 				// uncomment the following to show log messages on web pages
-				/*
-				array(
-					'class'=>'CWebLogRoute',
-				),
-				*/
+//				array(
+//					'class'=>'CWebLogRoute',
+//				),
 			),
 		),
 		'session' => array(
@@ -76,7 +87,8 @@ return array(
 	'params'=>array(
 		// this is used in contact page
 		'adminEmail'=>'ivan@primaguna.com',
-		'mainHost'=>'textalert.com'
+		'domain'=>'textalert.local',
+		'redirectHosts'=>array('www','web','admin','root','system','adm','w','ww','ftp','mail','irc','gopher','smtp','pop3','pop','imap')
 	),
 
 	'behaviors'=>array(

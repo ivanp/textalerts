@@ -50,6 +50,8 @@ class User extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'phone' => array(self::HAS_ONE, 'PhoneNumber', 'user_id'),
+			'companies' => array(self::HAS_MANY, 'Company', 'user_id'),
+			'memberships' => array(self::HAS_MANY, 'Membership', 'user_id')
 		);
 	}
 
@@ -138,5 +140,37 @@ class User extends CActiveRecord
 	public function isAdmin()
 	{
 		return (bool)$this->admin;
+	}
+
+	public function getDisplayName()
+	{
+		$name = trim($this->first_name.' '.$this->last_name);
+		if (!strlen($name)) {
+			$name = $this->email;
+		}
+		return $name;
+	}
+
+	public function createCompanyViewUrl(Company $company)
+	{
+		return Yii::app()->createCompanyUrl($company, 'user/view', array('id'=>$this->id));
+	}
+
+	public function createCompanyEditUrl(Company $company)
+	{
+		return Yii::app()->createCompanyUrl($company, 'user/edit', array('id'=>$this->id));
+	}
+
+	static public function getLevelOptions()
+	{
+		return array(
+			'member' => 'Standard member',
+			'sender' => 'E-mail sender',
+			'admin' => 'Administrator'
+		);
+	}
+
+	public function getSubscriptions(Company $company) {
+	  return Subscription::modelByCompany($company)->findAll('user_id = :user_id', array(':user_id'=>$this->id));
 	}
 }

@@ -19,6 +19,7 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/datepicker.css" />
 
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/superfish.css" />
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
@@ -34,7 +35,7 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 
 	<div id="mainmenu">
 		<?php $this->widget('zii.widgets.CMenu',array(
-			'items'=>$this->menu,
+			'items'=>isset($this->menu) ? $this->menu : array(),
 			'htmlOptions'=>array('class'=>'sf-menu')
 		)); 
 		
@@ -43,18 +44,18 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 	<script type="text/javascript">
 		$(document).ready(function() {
 			jQuery(function(){
-				jQuery('#yw0').superfish();
+				jQuery('#mainmenu ul').superfish();
 			});
 		});
 	</script>
 	<?php $this->widget('zii.widgets.CBreadcrumbs', array(
-		'links'=>$this->breadcrumbs,
+		'links'=>isset($this->breadcrumbs) ? $this->breadcrumbs : array(),
 	)); ?><!-- breadcrumbs -->
 
 	<?php echo $content; ?>
 
 	<div id="footer">
-		<?php echo Yii::powered(); ?>
+		Copyright &copy; 2010 TextAlerts Inc.
 	</div><!-- footer -->
 
 </div><!-- page -->

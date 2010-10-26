@@ -1,6 +1,6 @@
 <?php
 
-class SiteController extends AdminController
+class SiteController extends CAdminController
 {
 	public function actionIndex() {
 		$this->render('index');

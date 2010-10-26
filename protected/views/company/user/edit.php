@@ -3,7 +3,7 @@
 $this->pageTitle=Yii::app()->name . ' - '.$user->getDisplayName();
 $this->breadcrumbs=array(
 	'Users' => array('user/index'),
-	$user->getDisplayName() => array('user/view', array('id' => $user->id)),
+	$user->getDisplayName() => Yii::app()->createCompanyUrl($company, 'user/view', array('id' => $user->id)),
 	'Edit'
 );
 

@@ -12,6 +12,11 @@ if (Yii::app()->user->isGuest)
 		'content' => $this->renderPartial('_loginbox', array(), true)
 	);
 }
+
+$this->portlets[] = array(
+	'title' => 'Information',
+	'content' => $this->renderPartial('application.views.portlets.companygroupinfo', array(), true)
+);
 ?>
 <h2><?php echo $this->company->name?></h2>
 

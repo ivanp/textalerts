@@ -1,6 +1,6 @@
 <?php
 
-class CompanyController extends Controller
+class CompanyController extends CAdminController
 {
 	public function actionIndex()
 	{

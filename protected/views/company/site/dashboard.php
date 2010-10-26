@@ -4,10 +4,6 @@ $this->breadcrumbs=array(
 	'Dashboard',
 );
 
-$this->menu=array(
-	array('label'=>'Change Password', 'url'=>array('user/password')),
-	array('label'=>'Edit Profile', 'url'=>array('user/profile')),
-);
 
 ?>
 <h1>Welcome!</h1>
@@ -20,34 +16,7 @@ $this->menu=array(
 
 <?php endif; ?>
 
-<table border="0" style="width: 260px" class="table_alerts">
-	<caption>
-		<b>My E-mail alerts</b>
-	</caption>
-	<tr class="empty" style="display:none">
-		<td colspan="2">You are not subscribed to any group</td>
-	</tr>
-	<?php if (count($mail_alerts)): ?>
-	<?php foreach ($mail_alerts as $group): ?>
-	<?php echo $this->renderPartial('_group_row', array('type' => 'mail', 'group'=>$group)); ?>
-	<?php endforeach; ?>
-	<?php endif; ?>
-	<?php echo $this->renderPartial('_add_group', array('type' => 'mail')); ?>
-</table>
-		
 
-<table border="0" style="width: 260px" class="table_alerts">
-	<caption><b>My Text alerts</b></caption>
-	<tr class="empty" style="display:none">
-		<td colspan="2">You are not subscribed to any group</td>
-	</tr>
-	<?php if (count($user->text_alerts)): ?>
-	<?php foreach ($user->text_alerts as $group): ?>
-	<?php echo $this->renderPartial('_group_row', array('type' => 'text', 'group'=>$group)); ?>
-	<?php endforeach; ?>
-	<?php endif; ?>
-	<?php echo $this->renderPartial('_add_group', array('type' => 'text')); ?>
-</table>
 
 <script type="text/javascript">
 

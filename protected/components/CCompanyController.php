@@ -1,6 +1,6 @@
 <?php
 
-class CompanyController extends Controller
+class CCompanyController extends Controller
 {
 	public $layout='//layouts/column1';
 	
@@ -57,5 +57,13 @@ class CompanyController extends Controller
 	public function createAbsoluteUrl($route,$params=array(),$schema='',$ampersand='&')
 	{
 		return Yii::app()->createCompanyUrl($this->company,$route,$params,$schema,$ampersand);
+	}
+
+	public function renderPartial($view,$data=null,$return=false,$processOutput=false)
+	{
+		if (!is_array($data))
+			$data = array();
+		$data['company'] = $this->company;
+		return parent::renderPartial($view,$data,$return,$processOutput);
 	}
 }

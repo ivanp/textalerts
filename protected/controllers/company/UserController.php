@@ -20,6 +20,17 @@ class UserController extends CCompanyController
 		));
 	}
 
+	public function actionEdit($id)
+	{
+		$user = User::model()->findByPk($id);
+		$model = new CompanyMemberInfoForm();
+		$this->render('edit', array(
+			'company' => $this->company,
+			'user' => $user,
+			'model' => $model
+		));
+	}
+
 	public function actionSubscribe($group_id, $user_id)
 	{
 

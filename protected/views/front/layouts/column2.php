@@ -6,18 +6,17 @@
 		</div><!-- content -->
 	</div>
 	<div class="span-5 last">
+		<?php foreach ($this->portlets as $portlet): ?>
 		<div id="sidebar">
 		<?php
 			$this->beginWidget('zii.widgets.CPortlet', array(
-				'title'=>'Operations',
+				'title'=>$portlet['title'],
 			));
-			$this->widget('zii.widgets.CMenu', array(
-				'items'=>$this->menu,
-				'htmlOptions'=>array('class'=>'operations'),
-			));
+			echo $portlet['content'];
 			$this->endWidget();
 		?>
 		</div><!-- sidebar -->
+		<?php endforeach; ?>
 	</div>
 </div>
 <?php $this->endContent(); ?>

@@ -1,6 +1,6 @@
 <?php
 
-class SiteController extends Controller
+class SiteController extends CFrontController
 {
 //	public $layout='//layouts/column2';
 	/**
@@ -70,17 +70,8 @@ class SiteController extends Controller
 	public function actionDashboard()
 	{
 		$this->layout='//layouts/column2';
-		$user = User::getLoggedUser();
 		$this->render('dashboard', array(
-			'user' => $user,
-			'mail_alerts'	=> array(),
-			'text_alerts' => array(),
-			'avail_mail_alerts' => array(),
-			'avail_text_alerts' => array()
-//			'mail_alerts'	=> $user->mail_alerts,
-//			'text_alerts' => $user->text_alerts,
-//			'avail_mail_alerts' => Group::getAvailableMessageGroups(),
-//			'avail_text_alerts' => Group::getAvailableTextGroups()
+			'user' => Yii::app()->user->record
 		));
 	}
 

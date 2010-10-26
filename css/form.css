@@ -61,6 +61,10 @@ div.form label
 	display: block;
 }
 
+div.form .oneliner label {
+	display: inline;
+}
+
 div.form .row
 {
 	margin: 8px 0;
@@ -158,4 +162,8 @@ div.wide.form .buttons, div.wide.form .hint, div.wide.form .errorMessage
 {
 	clear: left;
 	padding-left: 110px;
+}
+
+.datepickerViewDays thead th, .datepickerViewMonths thead th, .datepickerViewYears thead th {
+	background-color: #121212;
 }

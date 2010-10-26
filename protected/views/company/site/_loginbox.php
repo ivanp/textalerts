@@ -1,12 +1,15 @@
 <?php
 $model = new LoginForm();
-
+if (!isset($returnUrl))
+{
+	$request = Yii::app()->getRequest();
+	$returnUrl = $request->getHostInfo().$request->getRequestUri();
+	Yii::app()->user->setReturnUrl($returnUrl);
+}
 ?><div class="form">
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'login-form',
-	'action'=>$this->createFrontUrl('user/login', array(
-		'returnUrl'=>Yii::app()->getRequest()->getRequestUri()
-	)),
+	'action'=>$this->createFrontUrl('user/login'),
 	'enableAjaxValidation'=>false
 )); ?>
 

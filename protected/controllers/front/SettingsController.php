@@ -1,6 +1,6 @@
 <?php
 
-class SettingsController extends Controller
+class SettingsController extends CFrontController
 {
 	
 }

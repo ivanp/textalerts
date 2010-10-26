@@ -17,7 +17,7 @@
 			$user = $subscriber->user;
 		?>
 		<tr>
-			<td><a href="<?php echo $user->createCompanyViewUrl($company)?>"><?php echo $user->displayName() ?></a></td>
+			<td><a href="<?php echo $user->createCompanyViewUrl($company)?>"><?php echo $user->getDisplayName() ?></a></td>
 			<td><?php echo $user->email ?></td>
 			<td></td>
 		</tr>

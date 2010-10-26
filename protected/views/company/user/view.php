@@ -9,6 +9,7 @@ $this->breadcrumbs=array(
 ?>
 <h2><?php echo $user->getDisplayName(); ?></h2>
 
+[ <a href="<?php echo $user->createCompanyEditUrl($company) ?>">Edit this user</a> ]
 <?php if(Yii::app()->user->hasFlash('contact')): ?>
 
 <div class="flash-success">
@@ -17,43 +18,41 @@ $this->breadcrumbs=array(
 
 <?php endif; ?>
 
-<div class="form">
-	<h3>User Info</h3>
-<?php $form=$this->beginWidget('CActiveForm'); ?>
+<br/><br/>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'firstName'); ?>
-		<?php echo $form->textField($model,'firstName'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'lastName'); ?>
-		<?php echo $form->textField($model,'lastName'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'email'); ?>
-		<?php echo $form->textField($model,'email'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'level'); ?>
-		<?php echo $form->dropDownList($model,'level', User::getLevelOptions(), array('prompt'=>'Select level of this user')); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'phoneNumber'); ?>
-		<?php echo $form->textField($model,'phoneNumber'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'carrier'); ?>
-		<?php echo $form->dropDownList($model,'carrier', array(), array('prompt'=>'Select carrier')); ?>
-	</div>
-
-	<div class="row buttons">
-		<?php echo CHtml::submitButton('Submit'); ?>
-	</div>
-	
-<?php $this->endWidget(); ?>
-</div>
+<table width="100%" border="1">
+	<caption>Subscribed to:</caption>
+	<thead>
+		<tr>
+			<th width="30%">Name</th>
+			<th>Members</th>
+			<th>Role</th>
+			<th>Subscription</th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ($user->getSubscriptions($company) as $subscription) {
+			$group = $subscription->group;
+			?>
+		<tr>
+			<td><?php echo $group->title; ?></td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td><input type="checkbox"/> E-mail
+					<input type="checkbox"/> Text
+					<button>Unsubscribe</button></td>
+		</tr>
+		<?php } ?>
+	</tbody>
+</table>
+<br/><br/>
+<p>
+	Subscribe to this group:<br/>
+	<select>
+		<option>Group 1</option>
+		<option>Group 2</option>
+	</select>
+	<input type="checkbox" checked="checked"/> E-mail
+	<input type="checkbox" checked="checked"/> Text
+	<button>Subscribe</button>
+</p>
