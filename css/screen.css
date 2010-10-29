@@ -235,6 +235,6 @@ hr.space {background:#fff;color:#fff;visibility:hidden;}
 .clearfix, .container {display:block;}
 .clear {clear:both;}
 
-#sidebar input[type=text],input[type=password],select,textarea {
+#sidebar input[type=text],#sidebar input[type=password],#sidebar select,#sidebar textarea {
 	width: 156px;
 }

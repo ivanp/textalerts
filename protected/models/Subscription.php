@@ -35,11 +35,29 @@ class Subscription extends CompanyActiveRecord
 
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
 			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'group' => array(self::BELONGS_TO, 'Group', 'group_id'),
 		);
+	}
+
+	protected function beforeSave()
+	{
+		if (parent::beforeSave())
+		{
+			if ($this->mail == 0 && $this->text == 0)
+			{
+				$this->delete();
+				return false;
+			}
+			else
+			{
+				if ($this->getIsNewRecord())
+					$this->since = date('Y-m-d H:i:s');
+				return true;
+			}
+		}
+		else
+			return false;
 	}
 }

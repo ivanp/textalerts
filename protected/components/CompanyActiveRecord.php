@@ -44,7 +44,8 @@ abstract class CompanyActiveRecord extends CActiveRecord
 				$companyClassName::$_static_company = $company;
 			}
 			$model = parent::model($companyClassName);
-		} else
+		}
+		else
 			$model = parent::model($className);
 //		$model->company = $company;
 		return $model;

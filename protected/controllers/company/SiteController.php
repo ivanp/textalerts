@@ -30,7 +30,15 @@ class SiteController extends CCompanyController
 	{
 		// renders the view file 'protected/views/site/index.php'
 		// using the default layout 'protected/views/layouts/main.php'
+		//$that_user = User::model()->findByPk(2);
+
+//		$user = current($this->company->administrators(array('condition' => 'user_id = 2')));
+//		var_dump($user);
+		
+		
 		$this->render('index');
+
+		
 	}
 
 	/**

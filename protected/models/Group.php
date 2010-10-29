@@ -48,6 +48,35 @@ ENGINE = MyISAM";
 		);
 	}
 
+	protected function beforeSave()
+	{
+		if (parent::beforeSave())
+		{
+			if ($this->getIsNewRecord())
+				$this->created = date('Y-m-d H:i:s');
+			else
+				$this->updated = date('Y-m-d H:i:s');
+
+
+			$retries = 0;
+			do {
+				$title = $this->title;
+				if ($retries++)
+					$title .= ' '.$retries;
+				$this->name = $this->normalizeText($title);
+			} while ($this->find('name = :name', array(':name' => $this->name)) instanceof Group);
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+	public function normalizeText($text)
+	{
+		return substr(preg_replace('#(\W|\s|_)+#', '-', strtolower(trim($text))), 0, 34);
+	}
+
 
 //	static public function getAvailableMessageGroups($user = null) {
 //		if (!($user instanceof User)) {
@@ -130,13 +159,72 @@ ENGINE = MyISAM";
 		// class name for the relations automatically generated below.
 		$subscription_model = Subscription::modelByCompany($this->company);
 		return array(
-			'subscribers' => array(self::HAS_MANY, get_class($subscription_model), 'group_id')
+			'subscribers' => array(self::HAS_MANY, get_class($subscription_model), 'group_id'),
+			'subscriberCount' => array(self::STAT, get_class($subscription_model), 'group_id')
 		);
 	}
 
-	public function getUsers()
+	public function subscribeUser(User $user, $type)
 	{
-	  //User::model()->findAl
+		//$subscription = Subscription::modelByCompany($this->company)->find('user_id = :user_id', array(':user_id' => $user->id));
+		$subscription = current($this->subscribers(array('condition'=>'user_id='.$user->id)));
+		if (!($subscription instanceof Subscription))
+		{
+			$class = get_class(Subscription::modelByCompany($this->company));
+			$subscription = new $class;
+			$subscription->group_id = $this->id;
+			$subscription->user_id = $user->id;
+		}
+		switch ($type)
+		{
+			case 'mail':
+				$subscription->mail = 1;
+				break;
+			case 'text':
+				$subscription->text = 1;
+				break;
+		}
+		$subscription->save();
+	}
+
+	public function unsubscribeUser(User $user, $type)
+	{
+		//$subscription = Subscription::modelByCompany($this->company)->find('group_id = :group_id and user_id = :user_id', array(':user_id' => $user->id));
+		$subscription = current($this->subscribers(array('condition'=>'user_id='.$user->id)));
+		if ($subscription instanceof Subscription)
+		{
+			switch ($type)
+			{
+				case 'mail':
+					$subscription->mail = 0;
+					break;
+				case 'text':
+					$subscription->text = 0;
+					break;
+			}
+			$subscription->save();
+		}
+	}
+
+	public function isUserSubscribed(User $user, $type = null)
+	{
+		if (is_null($type))
+			$subscription = current($this->subscribers(array('condition'=>'(mail=1 and text=1) and user_id='.$user->id)));
+		else
+		{
+			switch ($type)
+			{
+				case 'mail':
+					$subscription = current($this->subscribers(array('condition'=>'mail=1 and user_id='.$user->id)));
+					break;
+				case 'text':
+					$subscription = current($this->subscribers(array('condition'=>'text=1 and user_id='.$user->id)));
+					break;
+				default:
+					$subscription = false;
+			}
+		}
+		return ($subscription instanceof Subscription);
 	}
 
 //	public function __get($name)

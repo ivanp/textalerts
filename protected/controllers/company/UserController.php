@@ -6,7 +6,7 @@ class UserController extends CCompanyController
 {
 	public function actionIndex()
 	{
-
+		
 	}
 
 	public function actionView($id)
@@ -29,15 +29,5 @@ class UserController extends CCompanyController
 			'user' => $user,
 			'model' => $model
 		));
-	}
-
-	public function actionSubscribe($group_id, $user_id)
-	{
-
-	}
-
-	public function actionUnsubscribe($group_id, $user_id)
-	{
-		
 	}
 }

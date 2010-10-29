@@ -2,6 +2,8 @@
 
 class Company extends CActiveRecord
 {
+	public $ownerEmail;
+	
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -39,26 +41,16 @@ class Company extends CActiveRecord
 
 	public function isAdministrator(User $user)
 	{
-		foreach ($this->administrators as $admin)
-		{
-			if ($admin->id == $user->id)
-			{
-				return true;
-			}
-		}
-		return false;
+		if ($user->getIsNewRecord())
+			return false;
+		return (current($this->administrators(array('condition' => 'user_id = '.$user->id))) instanceof User);
 	}
 
 	public function isSender(User $user)
 	{
-		foreach ($this->senders as $admin)
-		{
-			if ($admin->id == $user->id)
-			{
-				return true;
-			}
-		}
-		return false;
+		if ($user->getIsNewRecord())
+			return false;
+		return (current($this->senders(array('condition' => 'user_id = '.$user->id))) instanceof User);
 	}
 
 	public function createUrl($route, $params = array(), $ampersand = '&')
@@ -77,6 +69,55 @@ class Company extends CActiveRecord
 	public function getGroups($condition = '', $params = array())
 	{
 		return $this->groupModel()->findAll($condition, $params);
+	}
+
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('name, host, ownerEmail', 'required'),
+			array('name, host', 'length', 'max' => 255),
+			array('ownerEmail', 'email'),
+			array('host', 'unique')
+		);
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'name' => 'Company Name',
+			'ownerEmail' => 'Owner\'s E-mail',
+			'host' => 'URL'
+		);
+	}
+
+	protected function beforeSave()
+	{
+		if(parent::beforeSave())
+		{
+			$user = User::model()->find('email=:email', array(':email'=>$this->ownerEmail));
+			if (!($user instanceof User))
+			{
+				$user = new User();
+				$user->email = $this->ownerEmail;
+				$user->first_name = '-';
+				$user->last_name = '- ';
+				$user->save();
+			}
+			$this->user_id = $user->id;
+
+			if ($this->getIsNewRecord())
+				$this->created = date('Y-m-d H:i:s');
+			else
+				$this->updated = date('Y-m-d H:i:s');
+
+			return true;
+		}
+		else
+			return false;
 	}
 
 //	public function __get($name)

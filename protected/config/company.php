@@ -9,8 +9,6 @@ return CMap::mergeArray(
 			'urlManager'=>array(
 				'rules'=>array(
 					''=>'site/index',
-					'site/subscribe/<type:\w+>/<group_id:\d+>'=>'site/subscribe',
-					'site/unsubscribe/<type:\w+>/<group_id:\d+>'=>'site/unsubscribe',
 					'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 					'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 				),

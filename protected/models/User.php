@@ -144,7 +144,7 @@ class User extends CActiveRecord
 
 	public function getDisplayName()
 	{
-		$name = trim($this->first_name.' '.$this->last_name);
+		$name = ucwords(strtolower(trim($this->first_name.' '.$this->last_name)));
 		if (!strlen($name)) {
 			$name = $this->email;
 		}
@@ -172,5 +172,10 @@ class User extends CActiveRecord
 
 	public function getSubscriptions(Company $company) {
 	  return Subscription::modelByCompany($company)->findAll('user_id = :user_id', array(':user_id'=>$this->id));
+	}
+
+	public function createViewUrl()
+	{
+		return Yii::app()->createFrontUrl('user/view', array('id'=>$this->id));
 	}
 }

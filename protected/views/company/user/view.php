@@ -24,9 +24,7 @@ $this->breadcrumbs=array(
 	<caption>Subscribed to:</caption>
 	<thead>
 		<tr>
-			<th width="30%">Name</th>
-			<th>Members</th>
-			<th>Role</th>
+			<th width="70%">Name</th>
 			<th>Subscription</th>
 		</tr>
 	</thead>
@@ -36,11 +34,8 @@ $this->breadcrumbs=array(
 			?>
 		<tr>
 			<td><?php echo $group->title; ?></td>
-			<td>&nbsp;</td>
-			<td>&nbsp;</td>
 			<td><input type="checkbox"/> E-mail
 					<input type="checkbox"/> Text
-					<button>Unsubscribe</button></td>
 		</tr>
 		<?php } ?>
 	</tbody>
