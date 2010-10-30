@@ -3,6 +3,8 @@
 class Company extends CActiveRecord
 {
 	public $ownerEmail;
+
+	private $_createModel = array('Group','Subscription','GroupMessage','MessageLog');
 	
 	public static function model($className=__CLASS__)
 	{
@@ -24,6 +26,7 @@ class Company extends CActiveRecord
 //			$group_model = 'Group';
 //		}
 		return array(
+			'info' => array(self::HAS_ONE, 'CompanyInfo', 'company_id'),
 			'owner' => array(self::BELONGS_TO, 'User', 'user_id'),
 			'administrators' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
 					'condition' => "level = 'admin'"
@@ -41,16 +44,13 @@ class Company extends CActiveRecord
 
 	public function isAdministrator(User $user)
 	{
-		if ($user->getIsNewRecord())
-			return false;
-		return (current($this->administrators(array('condition' => 'user_id = '.$user->id))) instanceof User);
+		return (($user->id == $this->owner->id) // owner?
+			|| (current($this->administrators(array('condition' => 'user_id = '.$user->id))) instanceof User));
 	}
 
 	public function isSender(User $user)
 	{
-		if ($user->getIsNewRecord())
-			return false;
-		return (current($this->senders(array('condition' => 'user_id = '.$user->id))) instanceof User);
+		return $this->isAdministrator($user) || (current($this->senders(array('condition' => 'user_id = '.$user->id))) instanceof User);
 	}
 
 	public function createUrl($route, $params = array(), $ampersand = '&')
@@ -92,6 +92,18 @@ class Company extends CActiveRecord
 			'ownerEmail' => 'Owner\'s E-mail',
 			'host' => 'URL'
 		);
+	}
+
+	protected function afterSave()
+	{
+		$connection = Yii::app()->db;
+		// Create necessary tables
+		foreach ($this->_createModel as $class)
+		{
+			$sql = call_user_func(array($class, 'createSqlByCompany'), $this);
+			$command = $connection->createCommand($sql);
+			$command->execute();
+		}
 	}
 
 	protected function beforeSave()

@@ -3,14 +3,15 @@ $cs = Yii::app()->clientScript;
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/datepicker.js'), CClientScript::POS_HEAD);
 
 
-
 $this->pageTitle=Yii::app()->name . ' - Create New Message';
 $this->breadcrumbs=array(
 	'Messages' => array('message/index'),
 	'Create New'
 );
-//new CActiveForm();
+
 ?>
+<h1>Send New Message</h1>
+
 <?php if(Yii::app()->user->hasFlash('contact')): ?>
 
 <div class="flash-success">
@@ -20,20 +21,38 @@ $this->breadcrumbs=array(
 <?php endif; ?>
 
 <div class="form">
-<?php $form=$this->beginWidget('CActiveForm'); ?>
+<?php $form=$this->beginWidget('CActiveForm', array(
+	'id'=>'message-form',
+	'enableAjaxValidation'=>false,
+));
+	?>
+	<p class="note">Fields with <span class="required">*</span> are required.</p>
+
+	<?php echo $form->errorSummary($model); ?>
 
 	<div class="row">
+		<?php echo $form->labelEx($model,'group_id'); ?>
+		<?php echo $form->dropDownList($model,'group_id',$groups,array('prompt'=>'Select group:')); ?>
+		<?php echo $form->error($model,'group_id'); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($model,'body'); ?>
+		<?php echo $form->textArea($model,'body',array('cols'=>40,'rows'=>4)); ?>
+		<?php echo $form->error($model,'body'); ?>
+	</div>
+
+	<div class="row buttons">
+		<?php echo CHtml::submitButton('Send now'); ?>
+	</div>
+
+<!--	<div class="row">
 		<label>Group:</label>
 		<select>
-			<?php foreach ($groups as $group): ?>
-			<option value="<?php echo $group->id?>"><?php echo htmlspecialchars($group->title)?></option>
-			<?php endforeach; ?>
 		</select>
 	</div>
 
 	<div class="row">
-		<?php echo $form->labelEx($model,'message'); ?>
-		<?php echo $form->textArea($model,'message'); ?>
 	</div>
 
 	<div class="row oneliner">
@@ -65,7 +84,7 @@ $this->breadcrumbs=array(
 				$('#calselect').DatePicker({
 					flat: true,
 	date: [],
-	current: '<?php echo date('Y-m-d') ?>',
+	current: 
 	format: 'Y-m-d',
 	calendars: 1,
 	mode: 'multiple'
@@ -78,8 +97,7 @@ $this->breadcrumbs=array(
 	</div>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Submit'); ?>
-	</div>
+	</div>-->
 
 <?php $this->endWidget(); ?>
 </div>

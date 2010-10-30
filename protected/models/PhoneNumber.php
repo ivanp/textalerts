@@ -35,7 +35,7 @@ class PhoneNumber extends CActiveRecord
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 //			array('', 'safe', 'on'=>'search'),
-			array('number', 'required')
+			array('number,user_id', 'required')
 		);
 	}
 

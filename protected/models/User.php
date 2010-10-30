@@ -55,6 +55,16 @@ class User extends CActiveRecord
 		);
 	}
 
+	public function havePhoneNumber()
+	{
+		return $this->phone instanceof PhoneNumber;
+	}
+
+	public function phoneNumberConfirmed()
+	{
+		return ($this->havePhoneNumber() && $this->phone->confirmed);
+	}
+
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */

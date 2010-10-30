@@ -16,14 +16,15 @@ class Group extends CompanyActiveRecord
 	{
 		$tableName = self::tableNameByCompany($company, self::baseTableName());
 		return "CREATE TABLE IF NOT EXISTS $tableName (
-  `id` INT NOT NULL ,
+  `id` INT NOT NULL AUTO_INCREMENT ,
   `name` VARCHAR(40) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NOT NULL ,
   `title` VARCHAR(255) NOT NULL ,
   `description` TEXT NULL ,
   `created` DATETIME NULL ,
   `updated` DATETIME NULL ,
   PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `name` (`name` ASC) )
+  UNIQUE INDEX `name` (`name` ASC) ,
+  INDEX `title` (`title` ASC) )
 ENGINE = MyISAM";
 	}
 

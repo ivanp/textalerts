@@ -4,7 +4,7 @@ class MessageLog extends CompanyActiveRecord
 {
 	public static function baseTableName()
 	{
-		return 'group';
+		return 'message_log';
 	}
 
 	public static function createSqlByCompany(Company $company)

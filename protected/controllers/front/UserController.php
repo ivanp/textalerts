@@ -1,9 +1,28 @@
 <?php
 
-Yii::import('application.vendors.*');
 require_once('Zend/Mail.php');
 
 class UserController extends CFrontController {
+	public function filters()
+	{
+		return array(
+			'accessControl'
+		);
+	}
+
+	public function accessRules()
+	{
+		return array(
+				array('allow',
+						'actions'=>array('profile'),
+						'users'=>array('@')
+				),
+				array('deny',
+					'actions'=>array('profile'),
+					'users'=>array('?')),
+		);
+	}
+
 	public function actionLogin()
 	{
 		$model=new LoginForm;
@@ -91,8 +110,16 @@ class UserController extends CFrontController {
 
 	public function actionProfile()
 	{
+		$model = new UserProfileForm();
+
+		if (isset($_POST['UserProfileForm']))
+		{
+			
+		}
+
 		$this->render('profile', array(
-			'user' => Yii::app()->user->record
+			'user' => Yii::app()->user->record,
+			'model' => $model
 		));
 	}
 

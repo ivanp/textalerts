@@ -21,7 +21,7 @@ class MessageQueue extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'message_queue';
+		return 'queues';
 	}
 
 	/**
@@ -43,10 +43,31 @@ class MessageQueue extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
+			'company' => array(self::BELONGS_TO, 'Company', 'company_id'),
 		);
+	}
+
+	/**
+	 *
+	 * @return GroupMessage
+	 */
+	public function getMessage()
+	{
+		return GroupMessage::modelByCompany($this->company)->findByPk($this->message_id);
+	}
+
+	protected function beforeSave()
+	{
+		if(parent::beforeSave())
+		{
+			if ($this->getIsNewRecord())
+				$this->created = date('Y-m-d H:i:s');
+
+			return true;
+		}
+		else
+			return false;
 	}
 
 	/**
@@ -56,21 +77,5 @@ class MessageQueue extends CActiveRecord
 	{
 		return array(
 		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		return new CActiveDataProvider('MessageQueue', array(
-			'criteria'=>$criteria,
-		));
 	}
 }

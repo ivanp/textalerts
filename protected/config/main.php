@@ -5,7 +5,8 @@
 
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
-return array(
+return CMap::mergeArray(
+	require(dirname(__FILE__).'/db.php'), array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'TextAlerts.com', // this thing must be the same across domains (cookie related)
 
@@ -16,7 +17,8 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
-		'application.models.forms.*'
+		'application.models.forms.*',
+		'application.vendors.*'
 //		'application.modules.srbac.controllers.SBaseController',
 //		'application.modules.srbac.*'
 	),
@@ -33,13 +35,6 @@ return array(
 
 	// application components
 	'components'=>array(
-		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=textalerts',
-			'emulatePrepare' => true,
-			'username' => 'pfredt',
-			'password' => '2A2enevuV',
-			'charset' => 'utf8',
-		),
 		'authManager'=>array(
 //			'class'=>'application.modules.srbac.components.SDbAuthManager',
 			'class'=>'CDbAuthManager',
@@ -52,7 +47,7 @@ return array(
 		'user'=>array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
-			'loginUrl' => 'http://textalert.local/user/login'
+			'loginUrl' => 'http://'.HOSTNAME_MAIN.'/user/login'
 		),
 		// uncomment the following to enable URLs in path-format
 		'urlManager'=>array(
@@ -78,8 +73,11 @@ return array(
 			),
 		),
 		'session' => array(
-			'cookieParams' => array('domain' => '.textalert.local')
-		)
+			'cookieParams' => array('domain' => '.'.HOSTNAME_MAIN)
+		),
+//		'swiftMailer' => array(
+//			'class' => 'ext.swiftMailer.SwiftMailer',
+//		),
 	),
 
 	// application-level parameters that can be accessed
@@ -87,7 +85,7 @@ return array(
 	'params'=>array(
 		// this is used in contact page
 		'adminEmail'=>'ivan@primaguna.com',
-		'domain'=>'textalert.local',
+		'domain'=>HOSTNAME_MAIN,
 		'redirectHosts'=>array('www','web','admin','root','system','adm','w','ww','ftp','mail','irc','gopher','smtp','pop3','pop','imap')
 	),
 
@@ -96,4 +94,4 @@ return array(
 			'class'=>'application.components.WebApplicationEndBehavior',
 		),
 	),
-);
+));

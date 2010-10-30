@@ -23,7 +23,7 @@ class GroupMessage extends CompanyActiveRecord
   `status` ENUM('draft','pending','sending','sent') NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_message_group1` (`group_id` ASC) ,
-  INDEX `created` (`created` ASC) ,
+  INDEX `created` (`created` ASC) 
 )
 ENGINE = MyISAM";
 	}
@@ -31,7 +31,28 @@ ENGINE = MyISAM";
 	public function rules()
 	{
 		return array(
-			array('body', 'required'),
+			array('body,group_id', 'required'),
+		);
+	}
+
+	protected function beforeSave()
+	{
+		if(parent::beforeSave())
+		{
+			if ($this->getIsNewRecord())
+				$this->created = date('Y-m-d H:i:s');
+
+			return true;
+		}
+		else
+			return false;
+	}
+
+	public function attributeLabels()
+	{
+		return array(
+			'group_id' => 'Group',
+			'body' => 'Message'
 		);
 	}
 
@@ -44,5 +65,13 @@ ENGINE = MyISAM";
 			'group' => array(self::BELONGS_TO, get_class($group_model), 'group_id'),
 			'logs' => array(self::HAS_MANY, get_class($log_model), 'message_id')
 		);
+	}
+
+	public function addLog($type, $message)
+	{
+		$log = MessageLog::factoryByCompany($this->company);
+		$log->type = $type;
+		$log->body = $message;
+		$log->save();
 	}
 }
