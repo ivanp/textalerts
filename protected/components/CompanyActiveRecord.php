@@ -78,6 +78,11 @@ abstract class CompanyActiveRecord extends CActiveRecord
 		return $company->id.'_'.$tableName;
 	}
 
+	public function getCompanyClass($className)
+	{
+		return get_class($className::modelByCompany($this->company));
+	}
+
 	public function tableName()
 	{
 		if ($this->company instanceof Company)

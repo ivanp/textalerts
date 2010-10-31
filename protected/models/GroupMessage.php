@@ -58,12 +58,9 @@ ENGINE = MyISAM";
 
 	public function relations()
 	{
-		$group_model = Group::modelByCompany($this->company);
-		$log_model = MessageLog::modelByCompany($this->company);
-		//$log_model =
 		return array(
-			'group' => array(self::BELONGS_TO, get_class($group_model), 'group_id'),
-			'logs' => array(self::HAS_MANY, get_class($log_model), 'message_id')
+			'group' => array(self::BELONGS_TO, $this->getCompanyClass('Group'), 'group_id'),
+			'logs' => array(self::HAS_MANY, $this->getCompanyClass('MessageLog'), 'message_id')
 		);
 	}
 

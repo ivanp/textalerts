@@ -35,6 +35,8 @@ class SiteController extends CCompanyController
 //		$user = current($this->company->administrators(array('condition' => 'user_id = 2')));
 //		var_dump($user);
 		
+//		$company = Company::model()->findByPk(1);
+
 		
 		$this->render('index');
 

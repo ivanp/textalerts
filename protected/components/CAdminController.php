@@ -20,13 +20,13 @@ class CAdminController extends Controller
 	{
 		return array(
 				// Allow only Super Administrators
-				array('allow',
-						'roles'=>array('SuperAdministrator')
-				),
-				// Kick out all other users
-				array('deny',
-						'users'=>array('*'),
-				),
+//				array('allow',
+//						'roles'=>array('SuperAdministrator')
+//				),
+//				// Kick out all other users
+//				array('deny',
+//						'users'=>array('*'),
+//				),
 		);
 	}
 }

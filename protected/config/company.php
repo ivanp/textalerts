@@ -5,6 +5,14 @@ return CMap::mergeArray(
 
 		// application components
 		'components'=>array(
+			'session' => array(
+				'cookieParams' => array('domain' => '.'.HOSTNAME)
+			),
+			'user'=>array(
+				'class'=>'CompanyWebUser',
+				'allowAutoLogin'=>true,
+				'loginUrl' => '/user/login'
+			),
 			// uncomment the following to enable URLs in path-format
 			'urlManager'=>array(
 				'rules'=>array(

@@ -3,13 +3,24 @@
 class Company extends CActiveRecord
 {
 	public $ownerEmail;
+	public $ownerFirstName;
+	public $ownerLastName;
 
-	private $_createModel = array('Group','Subscription','GroupMessage','MessageLog');
-	
+	private $_createModel = array('User','PhoneNumber', 'Group','Subscription','GroupMessage','MessageLog','StatusUpdate');
+
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
+
+//	public function __construct()
+//	{
+////		self::$_counter++;
+//
+//		parent::__construct();
+//
+////		error_log(self::$_counter.':__construct()');
+//	}
 
 	public function tableName()
 	{
@@ -18,6 +29,10 @@ class Company extends CActiveRecord
 
 	public function relations()
 	{
+//		error_log(CActiveRecord::$_counter.':relations()');
+//		if (isset($this->id))
+//						error_log('with ID='.$this->id);
+//		error_log(self::$_counter.':relations()');
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 //		if (isset($this->id)) {
@@ -27,30 +42,57 @@ class Company extends CActiveRecord
 //		}
 		return array(
 			'info' => array(self::HAS_ONE, 'CompanyInfo', 'company_id'),
-			'owner' => array(self::BELONGS_TO, 'User', 'user_id'),
-			'administrators' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
-					'condition' => "level = 'admin'"
-					),
-			'senders' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
-					'condition' => "level = 'sender'"
-					),
-			'members' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
-					'condition' => "level = 'member'"
-					),
-//			'allUsers' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)'),
-//			'groups' => array(self::MANY_MANY, $group_model, 'company_groups(company_id, group_id)')
+//			'owner' => array(self::BELONGS_TO, 'User', 'user_id'),
+			
+//			'administrators' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
+//					'condition' => "level = 'admin'"
+//					),
+//			'senders' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
+//					'condition' => "level = 'sender'"
+//					),
+//			'members' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
+//					'condition' => "level = 'member'"
+//					),
 		);
+	}
+
+	public function getOwner()
+	{
+		return User::modelByCompany($this)->findByPk(1);
+	}
+
+	public function getAdministrators()
+	{
+		return User::modelByCompany($this)->findAll('level=:level', array(':level'=>'admin'));
+	}
+
+	public function getSenders()
+	{
+		return User::modelByCompany($this)->findAll('level=:level', array(':level'=>'sender'));
+	}
+
+	public function getMembers()
+	{
+		return User::modelByCompany($this)->findAll('level=:level', array(':level'=>'member'));
+	}
+
+	public function getAllUsers()
+	{
+		return User::modelByCompany($this)->findAll();
 	}
 
 	public function isAdministrator(User $user)
 	{
-		return (($user->id == $this->owner->id) // owner?
-			|| (current($this->administrators(array('condition' => 'user_id = '.$user->id))) instanceof User));
+		if ($user->id == $this->owner->id)
+			return true;
+		$admin = User::modelByCompany($this)->find('id=:user_id and level=:level', array(':user_id'=>$user->id,':level'=>'admin'));
+		return ($admin instanceof User);
 	}
 
 	public function isSender(User $user)
 	{
-		return $this->isAdministrator($user) || (current($this->senders(array('condition' => 'user_id = '.$user->id))) instanceof User);
+		$sender = User::modelByCompany($this)->find('id=:user_id and level=:level', array(':user_id'=>$user->id,':level'=>'sender'));
+		return ($sender instanceof User);
 	}
 
 	public function createUrl($route, $params = array(), $ampersand = '&')
@@ -73,14 +115,11 @@ class Company extends CActiveRecord
 
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('name, host, ownerEmail', 'required'),
+			array('name, host', 'required'),
 			array('name, host', 'length', 'max' => 255),
-			array('ownerEmail', 'email'),
+			array('ownerEmail, ownerFirstName, ownerLastName', 'required', 'on' => 'insert'),
+			array('ownerEmail', 'email', 'on'=>'insert'),
 			array('host', 'unique')
 		);
 	}
@@ -94,33 +133,10 @@ class Company extends CActiveRecord
 		);
 	}
 
-	protected function afterSave()
-	{
-		$connection = Yii::app()->db;
-		// Create necessary tables
-		foreach ($this->_createModel as $class)
-		{
-			$sql = call_user_func(array($class, 'createSqlByCompany'), $this);
-			$command = $connection->createCommand($sql);
-			$command->execute();
-		}
-	}
-
 	protected function beforeSave()
 	{
 		if(parent::beforeSave())
 		{
-			$user = User::model()->find('email=:email', array(':email'=>$this->ownerEmail));
-			if (!($user instanceof User))
-			{
-				$user = new User();
-				$user->email = $this->ownerEmail;
-				$user->first_name = '-';
-				$user->last_name = '- ';
-				$user->save();
-			}
-			$this->user_id = $user->id;
-
 			if ($this->getIsNewRecord())
 				$this->created = date('Y-m-d H:i:s');
 			else
@@ -131,6 +147,32 @@ class Company extends CActiveRecord
 		else
 			return false;
 	}
+
+	public function insert($attributes=null)
+	{
+		if (parent::insert($attributes))
+		{
+			$connection = Yii::app()->db;
+			// Create necessary tables
+			foreach ($this->_createModel as $class)
+			{
+				$sql = call_user_func(array($class, 'createSqlByCompany'), $this);
+				$command = $connection->createCommand($sql);
+				$command->execute();
+			}
+
+			$user = User::factoryByCompany($this);
+			$user->email = $this->ownerEmail;
+			$user->first_name = $this->ownerFirstName;
+			$user->last_name = $this->ownerLastName;
+			$user->save();
+
+			return true;
+		}
+		else
+			return false;
+	}
+
 
 //	public function __get($name)
 //	{

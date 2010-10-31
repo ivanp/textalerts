@@ -15,7 +15,8 @@ switch ($_SERVER['SERVER_NAME'])
 		break;
 	default:
 		define('CONTROLLER_MODE', 'company');
-		break;;
+		define('HOSTNAME', $_SERVER['SERVER_NAME']);
+		break;
 }
 
 // Configuration differs for each mode

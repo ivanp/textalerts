@@ -9,7 +9,7 @@ if (!isset($returnUrl))
 ?><div class="form">
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'login-form',
-	'action'=>$this->createFrontUrl('user/login'),
+	'action'=>$this->createUrl('user/login'),
 	'enableAjaxValidation'=>false
 )); ?>
 

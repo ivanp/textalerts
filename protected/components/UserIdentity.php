@@ -13,17 +13,10 @@ class UserIdentity extends CUserIdentity
 	{
 		return $this->_id;
 	}
-	/**
-	 * Authenticates a user.
-	 * The example implementation makes sure if the username and password
-	 * are both 'demo'.
-	 * In practical applications, this should be changed to authenticate
-	 * against some persistent user identity storage (e.g. database).
-	 * @return boolean whether authentication succeeds.
-	 */
+
 	public function authenticate()
 	{
-		$user = User::model()->find('LOWER(email) = ?', array(strtolower($this->username)));
+		$user = User::modelByCompany(Yii::app()->getCompany())->find('LOWER(email) = ?', array(strtolower($this->username)));
 
 		if($user === null)
 			$this->errorCode=self::ERROR_USERNAME_INVALID;
@@ -32,7 +25,6 @@ class UserIdentity extends CUserIdentity
 		else {
 			$this->errorCode=self::ERROR_NONE;
 			$this->_id = (int)$user->id;
-			$this->setState('record', $user);
 		}
 		return !$this->errorCode;
 	}

@@ -35,21 +35,6 @@ return CMap::mergeArray(
 
 	// application components
 	'components'=>array(
-		'authManager'=>array(
-//			'class'=>'application.modules.srbac.components.SDbAuthManager',
-			'class'=>'CDbAuthManager',
-			'connectionID'=>'db',
-			'itemTable'=>'auth_item',
-			'itemChildTable'=>'auth_itemchild',
-			'assignmentTable'=>'auth_assignment',
-			'defaultRoles'=>array('Authenticated', 'Guest')
-		),
-		'user'=>array(
-			// enable cookie-based authentication
-			'allowAutoLogin'=>true,
-			'loginUrl' => 'http://'.HOSTNAME_MAIN.'/user/login'
-		),
-		// uncomment the following to enable URLs in path-format
 		'urlManager'=>array(
 			'showScriptName' => false, // remove index.php in URL
 			'urlFormat'=>'path',
@@ -71,9 +56,6 @@ return CMap::mergeArray(
 //					'class'=>'CWebLogRoute',
 //				),
 			),
-		),
-		'session' => array(
-			'cookieParams' => array('domain' => '.'.HOSTNAME_MAIN)
 		),
 //		'swiftMailer' => array(
 //			'class' => 'ext.swiftMailer.SwiftMailer',

@@ -1,27 +1,29 @@
 <?php
 
-/**
- * This is the model class for table "User".
- *
- * The followings are the available columns in table 'User':
- */
-class User extends CActiveRecord
+class User extends CompanyActiveRecord
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @return User the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+	public static function baseTableName()
 	{
 		return 'user';
+	}
+
+	public static function createSqlByCompany(Company $company)
+	{
+		$tableName = self::tableNameByCompany($company, self::baseTableName());
+		return "CREATE TABLE IF NOT EXISTS $tableName (
+  `id` INT NOT NULL AUTO_INCREMENT ,
+  `first_name` VARCHAR(45) NULL ,
+  `last_name` VARCHAR(45) NULL ,
+  `email` VARCHAR(45) NULL ,
+  `password` VARCHAR(45) NULL ,
+  `created` VARCHAR(45) NULL ,
+  `updated` DATETIME NULL )
+ENGINE = MyISAM";
+	}
+
+	public static function modelByCompany(Company $company)
+	{
+		return parent::modelByCompany($company, __CLASS__);
 	}
 
 	/**
@@ -49,10 +51,14 @@ class User extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'phone' => array(self::HAS_ONE, 'PhoneNumber', 'user_id'),
-			'companies' => array(self::HAS_MANY, 'Company', 'user_id'),
-			'memberships' => array(self::HAS_MANY, 'Membership', 'user_id')
+			'phone' => array(self::HAS_ONE, $this->getCompanyClass('PhoneNumber'), 'user_id'),
+			'subscriptions' => array(self::HAS_MANY, $this->getCompanyClass('Subscription'), 'user_id')
 		);
+	}
+
+	public function getCompanies()
+	{
+		return array($this->company);
 	}
 
 	public function havePhoneNumber()
@@ -141,7 +147,7 @@ class User extends CActiveRecord
 	static public function getLoggedUser()
 	{
 		if (!Yii::app()->user->isGuest) {
-			return User::model()->find('email = :email', array(':email' => Yii::app()->user->id));
+			return User::modelByCompany(Yii::app()->getCompany())->findByPk(Yii::app()->user->id);
 		} else {
 			return null;
 		}

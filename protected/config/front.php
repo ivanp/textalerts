@@ -5,6 +5,16 @@ return CMap::mergeArray(
 
 		// application components
 		'components'=>array(
+//			'authManager'=>array(
+//	//			'class'=>'application.modules.srbac.components.SDbAuthManager',
+//				'class'=>'CDbAuthManager',
+//				'connectionID'=>'db',
+//				'itemTable'=>'auth_item',
+//				'itemChildTable'=>'auth_itemchild',
+//				'assignmentTable'=>'auth_assignment',
+//				'defaultRoles'=>array('Authenticated', 'Guest')
+//			),
+			
 			// uncomment the following to enable URLs in path-format
 			'urlManager'=>array(
 				'rules'=>array(

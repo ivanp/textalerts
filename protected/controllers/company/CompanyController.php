@@ -5,29 +5,24 @@ class CompanyController extends CCompanyController
 	public function actionSettings()
 	{
 		$company = $this->company;
-		$info = $company->info;
+		$info = CompanyInfo::model()->findByPk($company->id);
 		if (!($info instanceof CompanyInfo))
-		{
 			$info = new CompanyInfo();
-		}
 
 		if (isset($_POST['Company'], $_POST['CompanyInfo']))
 		{
 			$company->attributes = $_POST['Company'];
 			$info->attributes = $_POST['CompanyInfo'];
-
-			if ($company->validate() && $info->validate())
-			{
-				$company->save(false);
+			if ($info->getIsNewRecord())
 				$info->company_id = $company->id;
-				$info->save(false);
 
-			}
+			if ($company->save() && $info->save())
+				Yii::app()->user->setFlash('message-settings', 'Company settings updated');
 		}
 
 		$this->render('settings', array(
-			'company_base'	=> $company,
-			'company_info' => $info
+			'company'	=> $company,
+			'info' => $info
 		));
 	}
 }

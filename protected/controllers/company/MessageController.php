@@ -17,9 +17,9 @@ class MessageController extends CCompanyController
 	{
 		return array(
 				// Allow only Super Administrators
-				array('allow',
-						'roles'=>array('SuperAdministrator')
-				),
+//				array('allow',
+//						'roles'=>array('SuperAdministrator')
+//				),
 				array('allow',
 						'users'=>array('@')
 				),

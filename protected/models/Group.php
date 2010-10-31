@@ -1,10 +1,5 @@
 <?php
 
-/**
- * This is the model class for table "Group".
- *
- * The followings are the available columns in table 'Group':
- */
 class Group extends CompanyActiveRecord
 {
 	public static function baseTableName()
@@ -156,12 +151,9 @@ ENGINE = MyISAM";
 
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		$subscription_model = Subscription::modelByCompany($this->company);
 		return array(
-			'subscribers' => array(self::HAS_MANY, get_class($subscription_model), 'group_id'),
-			'subscriberCount' => array(self::STAT, get_class($subscription_model), 'group_id')
+			'subscribers' => array(self::HAS_MANY, $this->getCompanyClass('Subscription'), 'group_id'),
+			'subscriberCount' => array(self::STAT, $this->getCompanyClass('Subscription'), 'group_id')
 		);
 	}
 
@@ -210,7 +202,7 @@ ENGINE = MyISAM";
 	public function isUserSubscribed(User $user, $type = null)
 	{
 		if (is_null($type))
-			$subscription = current($this->subscribers(array('condition'=>'(mail=1 and text=1) and user_id='.$user->id)));
+			$subscription = current($this->subscribers(array('condition'=>'(mail=1 or text=1) and user_id='.$user->id)));
 		else
 		{
 			switch ($type)

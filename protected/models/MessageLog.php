@@ -29,9 +29,8 @@ ENGINE = MyISAM";
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		$message_model = GroupMessage::modelByCompany($this->company);
 		return array(
-			'message' => array(self::BELONGS_TO, get_class($message_model), 'message_id'),
+			'message' => array(self::BELONGS_TO, $this->getCompanyClass('GroupMessage'), 'message_id'),
 		);
 	}
 }

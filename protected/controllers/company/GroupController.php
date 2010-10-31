@@ -76,7 +76,7 @@ class GroupController extends CCompanyController
 		$group = Group::modelByCompany($this->company)->findByPk($group_id);
 		if (!($group instanceof Group))
 			throw new CHttpException(404, 'Unknown group');
-		$user = User::model()->findByPk($user_id);
+		$user = User::modelByCompany($this->company)->findByPk($user_id);
 		if (!($user instanceof User))
 			throw new CHttpException(404, 'Unknown user');
 		// Check access
@@ -96,7 +96,7 @@ class GroupController extends CCompanyController
 		$group = Group::modelByCompany($this->company)->findByPk($group_id);
 		if (!($group instanceof Group))
 			throw new CHttpException(404, 'Unknown group');
-		$user = User::model()->findByPk($user_id);
+		$user = User::modelByCompany($this->company)->findByPk($user_id);
 		if (!($user instanceof User))
 			throw new CHttpException(404, 'Unknown user');
 		// Check access

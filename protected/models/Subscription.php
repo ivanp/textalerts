@@ -36,8 +36,8 @@ class Subscription extends CompanyActiveRecord
 	public function relations()
 	{
 		return array(
-			'user' => array(self::BELONGS_TO, 'User', 'user_id'),
-			'group' => array(self::BELONGS_TO, 'Group', 'group_id'),
+			'user' => array(self::BELONGS_TO, $this->getCompanyClass('User'), 'user_id'),
+			'group' => array(self::BELONGS_TO, $this->getCompanyClass('Group'), 'group_id'),
 		);
 	}
 
