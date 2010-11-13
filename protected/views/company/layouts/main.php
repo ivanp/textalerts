@@ -1,9 +1,11 @@
 <?php
-$cs = Yii::app()->clientScript;
+$cs = Yii::app()->getClientScript();
 
-//$cs->registerCoreScript('jquery');
+$cs->registerCoreScript('jquery');
+$cs->registerCoreScript('jquery.ui');
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/superfish.js'), CClientScript::POS_HEAD);
-//$cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/app.js'), CClientScript::POS_HEAD);
+$cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/app.js'), CClientScript::POS_HEAD);
+
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -23,6 +25,26 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/superfish.css" />
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			jQuery(function(){
+				jQuery('#mainmenu ul').superfish();
+			});
+
+			if (App.modules.company.<?php echo $this->uniqueid?>) {
+				if (App.modules.company.<?php echo $this->uniqueid?>.init &&
+					typeof(App.modules.company.<?php echo $this->uniqueid?>.init) == 'function') {
+					App.modules.company.<?php echo $this->uniqueid?>.init();
+				}
+
+				if (App.modules.company.<?php echo $this->uniqueid?>.<?php echo $this->action->id?> &&
+					typeof(App.modules.company.<?php echo $this->uniqueid?>.<?php echo $this->action->id?>) == 'function') {
+					App.modules.company.<?php echo $this->uniqueid?>.<?php echo $this->action->id?>();
+				}
+			}
+				
+		});
+	</script>
 </head>
 
 <body>
@@ -30,7 +52,7 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 <div class="container" id="page">
 
 	<div id="header">
-		<div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
+		<div id="logo"><a href="<?php echo $this->createUrl('/'); ?>"><?php echo htmlentities($this->company->info->heading); ?></a></div>
 	</div><!-- header -->
 
 	<div id="mainmenu">
@@ -41,13 +63,6 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 		
 		?>
 	</div><!-- mainmenu -->
-	<script type="text/javascript">
-		$(document).ready(function() {
-			jQuery(function(){
-				jQuery('#mainmenu ul').superfish();
-			});
-		});
-	</script>
 	<?php $this->widget('zii.widgets.CBreadcrumbs', array(
 		'links'=>isset($this->breadcrumbs) ? $this->breadcrumbs : array(),
 	)); ?><!-- breadcrumbs -->

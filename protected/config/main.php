@@ -35,6 +35,9 @@ return CMap::mergeArray(
 
 	// application components
 	'components'=>array(
+		'session' => array(
+			'cookieParams' => array('.'.HOSTNAME_ADMIN)
+		),
 		'urlManager'=>array(
 			'showScriptName' => false, // remove index.php in URL
 			'urlFormat'=>'path',
@@ -68,7 +71,9 @@ return CMap::mergeArray(
 		// this is used in contact page
 		'adminEmail'=>'ivan@primaguna.com',
 		'domain'=>HOSTNAME_MAIN,
-		'redirectHosts'=>array('www','web','admin','root','system','adm','w','ww','ftp','mail','irc','gopher','smtp','pop3','pop','imap')
+		'redirectHosts'=>array('www','web','admin','root','system','adm','w','ww',
+				'ftp','mail','irc','gopher','smtp','pop3','pop','imap','system','w3',
+				'administrator'),
 	),
 
 	'behaviors'=>array(

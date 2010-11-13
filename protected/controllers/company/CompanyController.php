@@ -7,14 +7,15 @@ class CompanyController extends CCompanyController
 		$company = $this->company;
 		$info = CompanyInfo::model()->findByPk($company->id);
 		if (!($info instanceof CompanyInfo))
+		{
 			$info = new CompanyInfo();
+			$info->company_id = $company->id;
+		}
 
 		if (isset($_POST['Company'], $_POST['CompanyInfo']))
 		{
 			$company->attributes = $_POST['Company'];
 			$info->attributes = $_POST['CompanyInfo'];
-			if ($info->getIsNewRecord())
-				$info->company_id = $company->id;
 
 			if ($company->save() && $info->save())
 				Yii::app()->user->setFlash('message-settings', 'Company settings updated');

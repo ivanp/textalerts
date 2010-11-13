@@ -32,10 +32,10 @@ if (!isset($returnUrl))
 	</div>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Login'); ?> <a href="#">Register</a>
+		<?php echo CHtml::submitButton('Login'); ?> <a href="<?php echo $this->createUrl('user/register') ?>">Register</a>
 	</div>
 
 <?php $this->endWidget(); ?>
 
-	<p><a href="<?php  ?>">I forgot my password</a></p>
+	<p><a href="<?php echo $this->createUrl('user/register') ?>">Click here to signup.</a><br/><a href="<?php echo $this->createUrl('user/forgotpassword') ?>">I forgot my password.</a></p>
 </div><!-- form -->

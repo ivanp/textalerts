@@ -5,22 +5,15 @@ class Company extends CActiveRecord
 	public $ownerEmail;
 	public $ownerFirstName;
 	public $ownerLastName;
+	public $ownerPassword;
 
-	private $_createModel = array('User','PhoneNumber', 'Group','Subscription','GroupMessage','MessageLog','StatusUpdate');
+	private $_createModel = array('User','PhoneNumber', 'Group','Subscription',
+			'GroupMessage','MessageLog','StatusUpdate','Event','Occurrence');
 
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
 	}
-
-//	public function __construct()
-//	{
-////		self::$_counter++;
-//
-//		parent::__construct();
-//
-////		error_log(self::$_counter.':__construct()');
-//	}
 
 	public function tableName()
 	{
@@ -29,17 +22,6 @@ class Company extends CActiveRecord
 
 	public function relations()
 	{
-//		error_log(CActiveRecord::$_counter.':relations()');
-//		if (isset($this->id))
-//						error_log('with ID='.$this->id);
-//		error_log(self::$_counter.':relations()');
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-//		if (isset($this->id)) {
-//			$group_model = get_class(Group::modelByCompany($this));
-//		} else {
-//			$group_model = 'Group';
-//		}
 		return array(
 			'info' => array(self::HAS_ONE, 'CompanyInfo', 'company_id'),
 //			'owner' => array(self::BELONGS_TO, 'User', 'user_id'),
@@ -69,6 +51,11 @@ class Company extends CActiveRecord
 	public function getSenders()
 	{
 		return User::modelByCompany($this)->findAll('level=:level', array(':level'=>'sender'));
+	}
+	
+	public function getManagers()
+	{
+		return User::modelByCompany($this)->findAll('level IN :level', array(':level'=>array('sender','admin')));
 	}
 
 	public function getMembers()
@@ -118,7 +105,7 @@ class Company extends CActiveRecord
 		return array(
 			array('name, host', 'required'),
 			array('name, host', 'length', 'max' => 255),
-			array('ownerEmail, ownerFirstName, ownerLastName', 'required', 'on' => 'insert'),
+			array('ownerEmail,ownerFirstName,ownerLastName,ownerPassword', 'required', 'on' => 'insert'),
 			array('ownerEmail', 'email', 'on'=>'insert'),
 			array('host', 'unique')
 		);
@@ -128,7 +115,7 @@ class Company extends CActiveRecord
 	{
 		return array(
 			'name' => 'Company Name',
-			'ownerEmail' => 'Owner\'s E-mail',
+//			'ownerEmail' => 'Owner\'s E-mail',
 			'host' => 'URL'
 		);
 	}
@@ -157,14 +144,15 @@ class Company extends CActiveRecord
 			foreach ($this->_createModel as $class)
 			{
 				$sql = call_user_func(array($class, 'createSqlByCompany'), $this);
-				$command = $connection->createCommand($sql);
-				$command->execute();
+				$connection->createCommand($sql)->execute();
 			}
 
 			$user = User::factoryByCompany($this);
 			$user->email = $this->ownerEmail;
 			$user->first_name = $this->ownerFirstName;
 			$user->last_name = $this->ownerLastName;
+			$user->password = $this->ownerPassword;
+			$user->level='admin';
 			$user->save();
 
 			return true;

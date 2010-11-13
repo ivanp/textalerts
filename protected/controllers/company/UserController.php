@@ -66,6 +66,9 @@ class UserController extends CCompanyController
 			if($model->validate() && $model->login())
 				$this->redirect(Yii::app()->user->returnUrl);
 		}
+
+		// clear the password field
+		$model->password='';
 		// display the login form
 		$this->render('login',array('model'=>$model));
 	}
@@ -77,19 +80,20 @@ class UserController extends CCompanyController
 	}
 
 	public function actionRegister() {
-		$model=new User;
-
+		$model = User::factoryByCompany($this->company);
+		$model->setScenario('register');
+		$varname = get_class($model);
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['User']))
+		if(isset($_POST[$varname]))
 		{
-			$model->attributes=$_POST['User'];
+			$model->attributes=$_POST[$varname];
 			$password = $model->generatePassword();
-			if($model->save()) {
+			if ($model->save())
+			{
 				$this->render('register_complete',array(
-					'model'=>$model,
-					'password'=>$password
+					'model'=>$model
 				));
 
 				$content = $this->renderPartial('register_email',array(
@@ -104,7 +108,7 @@ class UserController extends CCompanyController
 				$mail->setBodyHtml($content);
 				$mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
 				$mail->addTo($model->email, $model->first_name.' '.$model->last_name);
-				$mail->setSubject('TestSubject');
+				$mail->setSubject('Registration on homeduck.com');
 				$mail->send();
 
 				Yii::app()->end();
@@ -119,31 +123,269 @@ class UserController extends CCompanyController
 
 	public function actionForgotPassword()
 	{
+		$model=new ForgotPasswordForm();
 
-	}
-
-	public function actionPhone()
-	{
-		echo 'setting phone number here';
-	}
-
-	public function actionProfile()
-	{
-		$model = new UserProfileForm();
-
-		if (isset($_POST['UserProfileForm']))
+		if (isset($_POST['ForgotPasswordForm']))
 		{
+			$model->attributes=$_POST['ForgotPasswordForm'];
+			if ($model->validate())
+			{
+				$user=User::modelByCompany($this->company)->find('email=:email',array(':email'=>$model->email));
+				if (!($user instanceof User))
+					throw new CHttpException(404, 'Invalid email given');
+				$user->generateCode();
+				$user->setScenario('recoverpassword');
+				$user->save();
 
+				$content = $this->renderPartial('forgotpassword_email',array(
+					'resetPwdUrl' => $this->createAbsoluteUrl('user/resetpassword',array('email'=>$user->email,'code'=>$user->code))
+				), true);
+
+				// Send e-mail
+				$mail = new Zend_Mail();
+				$mail->setBodyHtml($content);
+				$mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
+				$mail->addTo($user->email, $user->getDisplayName());
+				$mail->setSubject('Password recovery on homeduck.com');
+				$mail->send();
+
+				$this->render('forgotpassword_complete');
+				Yii::app()->end();
+			}
 		}
 
+		$this->render('forgotpassword', array(
+			'model'=>$model
+		));
+	}
+
+	public function actionResetpassword()
+	{
+		if (!Yii::app()->user->isGuest)
+			$this->redirect('/', true);
+
+		$email=Yii::app()->getRequest()->getParam('email');
+		$code=Yii::app()->getRequest()->getParam('code');
+
+		if ($email===null || $code===null)
+			throw new CHttpException(400, 'Required parameter not exist');
+		$user=User::modelByCompany($this->company)->find('email=:email',array(':email'=>$email));
+		if (!($user instanceof User)) // such email not found
+			throw new CHttpException (404, 'E-mail address not found');
+		if (strlen($code) && 0===strcmp($code,$user->code))
+		{
+			$model=new ResetPasswordForm();
+			if (isset($_POST['ResetPasswordForm']))
+			{
+				$model->attributes=$_POST['ResetPasswordForm'];
+				if ($model->validate())
+				{
+					$user->password=$model->password;
+					$user->password_repeat=$model->password_repeat;
+					$user->code=null;
+					if ($user->save())
+					{
+						Yii::app()->user->setFlash('user-login','You have reset your password. You can now login with your new password.');
+						$this->redirect(array('user/login'), true);
+					}
+				}
+			}
+
+			$this->render('resetpassword',array(
+				'model'=>$model,
+				'user'=>$user
+			));
+		}
+		else
+		{
+			$this->render('resetpassword_invalidcode',array(
+				'forgotPwdUrl'=>$this->createCompanyUrl($this->company, 'user/forgotpassword')
+			));
+		}
+	}
+
+	public function actionProfile($id = null)
+	{
+		$own_profile = true;
+		$set_privilege = false;
+		$user = User::getLoggedUser();
+		if ($id !== null)
+		{
+			$own_profile = false;
+			if (!$this->company->isAdministrator($user))
+				throw new CHttpException(401, 'Access Denied');
+			else
+			{
+				$owner = $this->company->owner;
+				// Editing other user's profile
+				if ($user->id!=$id)
+				{
+					// Administrator cannot edit owner's profile
+					if ($id==$owner->id)
+						throw new CHttpException(401, 'Access Denied');
+					$set_privilege=true;
+				}
+			}
+			$user = User::modelByCompany($this->company)->findByPk($id);
+			if (!($user instanceof User))
+				throw new CHttpException(404, 'User not found');
+		}
+		$phone = $user->phone;
+		if (!($phone instanceof PhoneNumber))
+		{
+			$phone = PhoneNumber::factoryByCompany($this->company);
+			$phone->user_id = $user->id;
+			$phone->save();
+		}
+
+		$vn_user = get_class($user);
+		$vn_phone = get_class($phone);
+
+		if (isset($_POST[$vn_user], $_POST[$vn_phone]))
+		{
+			$user->attributes = $_POST[$vn_user];
+			$phone->attributes = $_POST[$vn_phone];
+			if ($set_privilege && isset($_POST[$vn_user]['level']))
+				$user->level = $_POST[$vn_user]['level'];
+			if ($user->save() && $phone->save())
+				Yii::app()->user->setFlash('user-profile', 'User profile has been updated');
+		}
+
+		unset($user->password);
+		$user->password_repeat = '';
+		$carriers = array();
+		foreach (Carrier::model()->findAll() as $carrier)
+			$carriers[$carrier->id] = $carrier->name;
+		if ($phone->number=='')
+			$phone->carrier_id='';
+
 		$this->render('profile', array(
-			'user' => Yii::app()->user->record,
-			'model' => $model
+			'user' => $user,
+			'phone' => $phone,
+			'carriers' => $carriers,
+			'own_profile' => $own_profile,
+			'set_privilege'=>$set_privilege
 		));
 	}
 
 	public function actionPassword()
 	{
 		$this->render('password');
+	}
+
+	public function actionConfirmphone()
+	{
+		if (!Yii::app()->getRequest()->getIsPostRequest())
+			throw new CHttpException (405, 'Only POST allowed');
+		$user = User::getLoggedUser();
+		if (!$user->havePhoneNumber())
+			$this->jsonResponse(false,'No phone number');
+		if ($user->isPhoneConfirmed())
+			$this->jsonResponse(true, 'Phone number already confirmed');
+
+		$code = Yii::app()->getRequest()->getPost('code');
+		$phone = $user->phone;
+		if ($phone->code == $code)
+		{
+			$phone->confirmed = 1;
+			$phone->save();
+			$this->jsonResponse(true, 'Phone number confirmed!');
+		}
+		else
+			$this->jsonResponse(false, 'Invalid confirmation code');
+	}
+
+	public function actionResend()
+	{
+		
+	}
+
+	public function actionSearchac()
+	{
+		$term=Yii::app()->getRequest()->getParam('term');
+
+		$users=User::modelByCompany($this->company)->limit(5)->findAll('email LIKE :email',array(':email'=>$term.'%'));
+		$arr=array();
+		foreach ($users as $user)
+		{
+			$arr[]=array(
+				'label'=>$user->email,
+			);
+		}
+		echo CJSON::encode($arr);
+	}
+
+	public function actionSubscription($id=null)
+	{
+		$editing_own=true;
+		$user=User::getLoggedUser();
+		if ($id !== null)
+		{
+			$own_profile=false;
+			if (!$this->company->isAdministrator($user))
+				throw new CHttpException(401, 'Access Denied');
+			else
+			{
+				$owner=$this->company->owner;
+				// Editing other user's profile
+				if ($user->id!=$id)
+				{
+					// Administrator cannot edit owner's profile
+					if ($id==$owner->id)
+						throw new CHttpException(401, 'Access Denied');
+					$set_privilege=true;
+				}
+			}
+			$user = User::modelByCompany($this->company)->findByPk($id);
+			if (!($user instanceof User))
+				throw new CHttpException(404, 'User not found');
+		}
+
+		$request=Yii::app()->getRequest();
+		if ($request->getIsPostRequest())
+		{
+			$group=Group::modelByCompany($this->company)
+							->findByPk($request->getPost('group_id'));
+			if (!($group instanceof Group))
+				throw new CHttpException(404);
+			$group->subscribeUser($user, 'mail');
+
+			if ($request->getIsAjaxRequest())
+			{
+				$this->renderPartial('_subscription_row',array(
+					'user'=>$user,
+					'group'=>$group
+				));
+				Yii::app()->end();
+			}
+			else
+				Yii::app()->user->setFlash('user-subscription',
+								sprintf('Email %s has been added to group "%s"',
+												$user->email,$group->title));
+		}
+
+		$available_groups=array();
+		$subscribed_groups=array();
+		$groups=Group::modelByCompany($this->company)
+				->sortByTitle()->findAll();
+		foreach ($groups as $group)
+		{
+			if ($user->subscriptions(array('condition'=>'group_id='.$group->id)))
+				$subscribed_groups[]=$group;
+			else
+				$available_groups[]=$group;
+		}
+
+		$this->render('subscription',array(
+			'user'=>$user,
+			'subscribed_groups'=>$subscribed_groups,
+			'available_groups'=>$available_groups
+		));
+	}
+
+	private function jsonResponse($success=true,$message)
+	{
+		echo json_encode(array('status'=>$success ? 1 : 0,'message'=>$message));
+		exit;
 	}
 }

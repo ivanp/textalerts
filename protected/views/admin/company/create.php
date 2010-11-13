@@ -6,4 +6,4 @@ $this->breadcrumbs=array(
 );
 ?>
 <h1>Create new company</h1>
-<?php echo $this->renderPartial('_company_form', array('model'=>$model)); ?>
+<?php echo $this->renderPartial('_company_form', array('company'=>$company,'info'=>$info)); ?>

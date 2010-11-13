@@ -7,6 +7,12 @@ $this->breadcrumbs=array(
 
 <h1>Login</h1>
 
+<?php if(Yii::app()->user->hasFlash('user-login')): ?>
+<div class="flash-success">
+	<?php echo Yii::app()->user->getFlash('user-login'); ?>
+</div>
+<?php endif; ?>
+
 <p>Please fill out the following form with your login credentials:</p>
 
 <div class="form">
@@ -41,5 +47,7 @@ $this->breadcrumbs=array(
 
 <?php $this->endWidget(); ?>
 
-	<p><a href="<?php echo $this->createUrl('user/register') ?>">Click here to signup.</a></p>
+	<p><a href="<?php echo $this->createUrl('user/register') ?>">Click here to signup.</a> Or <a href="<?php echo $this->createUrl('user/forgotpassword') ?>">I forgot my password.</a></p>
+
+	<p></p>
 </div><!-- form -->

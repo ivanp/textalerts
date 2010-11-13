@@ -153,7 +153,8 @@ ENGINE = MyISAM";
 	{
 		return array(
 			'subscribers' => array(self::HAS_MANY, $this->getCompanyClass('Subscription'), 'group_id'),
-			'subscriberCount' => array(self::STAT, $this->getCompanyClass('Subscription'), 'group_id')
+			'subscriberCount' => array(self::STAT, $this->getCompanyClass('Subscription'), 'group_id'),
+			'messages'=>array(self::HAS_MANY,$this->getCompanyClass('GroupMessage'),'group_id')
 		);
 	}
 
@@ -219,6 +220,32 @@ ENGINE = MyISAM";
 		}
 		return ($subscription instanceof Subscription);
 	}
+
+	public function getLastMessageTime()
+	{
+		$message=current($this->messages(array('limit'=>1,'order'=>'created DESC')));
+		if ($message instanceof GroupMessage)
+			return $message->created;
+		else
+			return null;
+	}
+
+	public function scopes()
+	{
+		return array(
+			'sortByTitle'=>array(
+				'order'=>'title'
+			)
+		);
+	}
+
+//	public function order()
+//	{
+//		$this->getDbCriteria()->mergeWith(array(
+//			'limit'=>$limit
+//		));
+//		return $this;
+//	}
 
 //	public function __get($name)
 //	{

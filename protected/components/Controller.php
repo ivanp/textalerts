@@ -2,9 +2,9 @@
 
 class Controller extends CController
 {
-	public $menu = array();
-	public $breadcrumbs = array();
-	public $portlets = array();
+	public $menu=array();
+	public $breadcrumbs=array();
+	public $portlets=array();
 
 	public function init()
 	{

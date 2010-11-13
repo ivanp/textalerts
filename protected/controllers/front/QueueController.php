@@ -6,8 +6,6 @@ Yii::import('ext.swiftMailer.SwiftMailer');
 class QueueController extends CFrontController
 {
 	const QueuesPerRequest = 100;
-	const MailsPerMinute = 100;
-
 
 	public function init()
 	{
@@ -63,46 +61,23 @@ class QueueController extends CFrontController
 
 	protected function sendMail(GroupMessage $message, User $user)
 	{
-		$message = Swift_Message::newInstance('Wonderful Subject')
-			->setFrom(array('ivan@primaguna.com' => 'Ivan P'))
-			->setTo(array($user->email => $user->getDisplayName()))
-			->setBody($message->body)
-			;
+		$company = $user->company;
+		$company_info = $company->info;
+		$from_mail = $company_info->email_from;
+		$from_name = $company->name;
 
-		$this->mailerInstance()->send($message);
+		CompanyMailer::sendMessage(array($from_mail=>$from_name),$user->email, $message->body, $company->name);
 	}
 
 	protected function sendText(GroupMessage $message, User $user)
 	{
 		if (!$user->havePhoneNumber() || !$user->phoneNumberConfirmed())
 		{
-			$message->addLog('error', sprintf('User %u does not have phone number or not confirmed yet', $user->id));
+			$message->addLog('error', sprintf('User %d does not have phone number or not confirmed yet', $user->id));
 			return;
 		}
 
-		$message = Swift_Message::newInstance('Wonderful Subject')
-			->setFrom(array('ivan@primaguna.com' => 'Ivan P'))
-			->setTo(array($user->email => $user->getDisplayName()))
-			->setBody($message->body)
-			;
-
-		$this->mailerInstance()->send($message);
-	}
-
-	protected function mailerInstance()
-	{
-		static $mailer;
-
-		if (!isset($mailer))
-		{
-			$transport = Swift_MailTransport::newInstance();
-			$mailer = Swift_Mailer::newInstance($transport);
-
-			$mailer->registerPlugin(new Swift_Plugins_ThrottlerPlugin(
-				self::MailsPerMinute, Swift_Plugins_ThrottlerPlugin::MESSAGES_PER_MINUTE
-			));
-		}
-
-		return $mailer;
+		$to_mail = $user->phone->getSmsMailGateway();
+		CompanyMailer::sendMessage(array($to_mail), $message->body);
 	}
 }

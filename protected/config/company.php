@@ -17,6 +17,7 @@ return CMap::mergeArray(
 			'urlManager'=>array(
 				'rules'=>array(
 					''=>'site/index',
+					'event/view/<eid:\d+>'=>'event/view',
 					'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 					'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 				),

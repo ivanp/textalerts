@@ -3,7 +3,9 @@ $roles = array('Member', 'Administrator', 'Sender', 'Non-member');
 
 ?>
 <h2>Groups</h2>
+<?php if ($this->company->isAdministrator(User::getLoggedUser())): ?>
 <h4><a href="<?php echo $this->createUrl('group/create'); ?>">Create new group</a></h4>
+<?php endif; ?>
 
 <?php if(Yii::app()->user->hasFlash('group')):?>
     <div class="flash-success">
@@ -18,15 +20,21 @@ $roles = array('Member', 'Administrator', 'Sender', 'Non-member');
 			<th width="50%">Name</th>
 			<th width="10%">Members</th>
 			<th>Last message</th>
-			<th>Subscription</th>
+			<th>Your Subscription</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php foreach ($groups as $group): ?>
 		<tr>
-			<td><a href="<?php echo $group->createViewUrl()?>"><?php echo $group->title?></a></td>
+			<td>
+				<?php if ($this->company->isAdministrator(User::getLoggedUser())): ?>
+				<a href="<?php echo $group->createViewUrl()?>"><?php echo htmlentities($group->title)?></a>
+				<?php else: ?>
+				<?php echo htmlentities($group->title)?>
+				<?php endif; ?>
+			</td>
 			<td class="center"><?php echo $group->subscriberCount ?></td>
-			<td><?php echo date('Y-m-d H:i:s', time()-mt_rand(3600, 86400*3)); ?></td>
+			<td><?php echo $group->getLastMessageTime() ?></td>
 			<td>
 				<?php if (!Yii::app()->user->isGuest) {
 					$user = Yii::app()->user->record;
@@ -52,3 +60,11 @@ $roles = array('Member', 'Administrator', 'Sender', 'Non-member');
 	</tbody>
 </table>
 <?php echo CHtml::endForm(); ?>
+
+<?php if ($pages->pageCount > 1): ?>
+<div class="pagelinks">
+<?$this->widget('CLinkPager', array(
+    'pages' => $pages,
+))?>
+<?php endif; ?>
+</div>

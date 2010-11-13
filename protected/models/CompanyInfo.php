@@ -23,12 +23,26 @@ class CompanyInfo extends CActiveRecord
 	{
 		return array(
 			array('heading,title,email_from,email_server', 'required'),
+//			array('company_id', 'required', 'on'=>'insert'),
+			array('company_id', 'unsafe', 'on'=>'update'),
 			array('email_pass,use_eztext,eztext_user,eztext_pass,bb_text', 'safe'),
 			array('email_from', 'email'),
 		);
 	}
 
-	public function beforeSave() {
+	public function attributeLabels()
+	{
+		return array(
+			'heading'=>'Heading Text',
+			'title'=>'Title Text',
+			'use_eztext'=>'Use EZ Texting Gateway for texts',
+			'eztext_user'=>'EZ Texting User Name',
+			'eztext_pass'=>'EZ Texting Password'
+		);
+	}
+
+	public function beforeSave()
+	{
 		if (parent::beforeSave())
 		{
 			if ($this->use_eztext)

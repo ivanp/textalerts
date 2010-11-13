@@ -41,6 +41,8 @@ class MainApplication extends CWebApplication {
 				$this->getRequest()->redirect($this->createFrontUrl('site/invalidhost'), true, 302);
 		}
 
+//		$command = $this->db->createCommand('SET AUTOCOMMIT=0');
+//		$command->execute();
 	}
 
 	public function createFrontUrl($route,$params=array(),$ampersand='&')

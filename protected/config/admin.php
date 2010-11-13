@@ -6,9 +6,19 @@ return CMap::mergeArray(
 		// application components
 		'components'=>array(
 			'user'=>array(
-				'loginUrl' => 'http://textalert.local/'
+				'class'=>'AdminWebUser',
+//				'allowAutoLogin'=>true,
+				'loginUrl' => '/user/login'
 			),
-			
+			'authManager'=>array(
+	//			'class'=>'application.modules.srbac.components.SDbAuthManager',
+				'class'=>'CDbAuthManager',
+				'connectionID'=>'db',
+				'itemTable'=>'auth_item',
+				'itemChildTable'=>'auth_itemchild',
+				'assignmentTable'=>'auth_assignment',
+//				'defaultRoles'=>array('Authenticated', 'Guest')
+			),
 			'urlManager'=>array(
 				'rules'=>array(
 					''=>'site/index',

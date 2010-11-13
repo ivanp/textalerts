@@ -1,12 +1,6 @@
 <?php
 
-$menu = array(
-	array('label'=>'Home', 'url'=>$this->createUrl('/site/index')),
-	array('label'=>'Companies', 'url'=>$this->createUrl('/company/index')),
-	array('label'=>'Users', 'url'=>$this->createUrl('/user/index')),
-	array('label'=>'Access Control', 'url'=>array('/srbac')),
-	array('label'=>'Logs', 'url'=>$this->createUrl('/log/index')),
-);
+
 
 $cs = Yii::app()->clientScript;
 
@@ -19,6 +13,9 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 <title><?php echo CHtml::encode($this->pageTitle); ?></title>
 <link rel="stylesheet" href="styles.css" type="text/css" />
 <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/admin.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/datepicker.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/superfish.css" />
 </head>
 
 <body>
@@ -30,7 +27,7 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
     </div>
     <div id="nav">
     	<?php $this->widget('zii.widgets.CMenu',array(
-			'items'=>$menu
+			'items'=>$this->menu
 		));
 
 		?>

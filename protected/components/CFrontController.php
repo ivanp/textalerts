@@ -15,17 +15,16 @@ class CFrontController extends Controller
 	{
 		$this->menu = array(
 				array('label'=>'Home', 'url'=>array('site/index')),
-//				array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),
-//				array('label'=>'Contact', 'url'=>array('/site/contact')),
-				array('label'=>'Dashboard', 'url'=>array('site/dashboard'), 'visible'=>!Yii::app()->user->isGuest),
-//				array('label' => 'Control Center', 'url'=>array('/admin'), 'visible' => (!Yii::app()->user->isGuest && Yii::app()->user->record->admin == 'Y')),
-				array('label'=>'Login', 'url'=>array('/user/login'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Register', 'url'=>array('/user/register'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Account ('.Yii::app()->user->name.')', 'url'=>array('/user/account'), 'visible'=>!Yii::app()->user->isGuest, 'items' => array(
-						array('label' => 'Profile', 'url'=>array('/user/profile')),
-						array('label' => 'Password', 'url'=>array('/user/password')),
-						array('label' => 'Logout', 'url'=>array('/user/logout'))
-				)),
+				array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),
+				array('label'=>'Contact', 'url'=>array('/site/contact')),
+//				array('label'=>'Dashboard', 'url'=>array('site/dashboard'), 'visible'=>!Yii::app()->user->isGuest),
+//				array('label'=>'Login', 'url'=>array('/user/login'), 'visible'=>Yii::app()->user->isGuest),
+//				array('label'=>'Register', 'url'=>array('/user/register'), 'visible'=>Yii::app()->user->isGuest),
+//				array('label'=>'Account ('.Yii::app()->user->name.')', 'url'=>array('/user/account'), 'visible'=>!Yii::app()->user->isGuest, 'items' => array(
+//						array('label' => 'Profile', 'url'=>array('/user/profile')),
+//						array('label' => 'Password', 'url'=>array('/user/password')),
+//						array('label' => 'Logout', 'url'=>array('/user/logout'))
+//				)),
 			);
 	}
 }
