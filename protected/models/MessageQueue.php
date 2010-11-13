@@ -1,81 +1,31 @@
 <?php
 
-/**
- * This is the model class for table "MessageQueue".
- *
- * The followings are the available columns in table 'MessageQueue':
- */
-class MessageQueue extends CActiveRecord
+class MessageQueue extends CompanyActiveRecord
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @return MessageQueue the static model class
-	 */
-	public static function model($className=__CLASS__)
+	public static function baseTableName()
 	{
-		return parent::model($className);
+		return 'message_queue';
 	}
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+	public static function modelByCompany(Company $company)
 	{
-		return 'queues';
+		return parent::modelByCompany($company, __CLASS__);
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
+	public static function createSqlByCompany(Company $company)
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
-		return array(
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('', 'safe', 'on'=>'search'),
-		);
-	}
-
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		return array(
-			'company' => array(self::BELONGS_TO, 'Company', 'company_id'),
-		);
-	}
-
-	/**
-	 *
-	 * @return GroupMessage
-	 */
-	public function getMessage()
-	{
-		return GroupMessage::modelByCompany($this->company)->findByPk($this->message_id);
-	}
-
-	protected function beforeSave()
-	{
-		if(parent::beforeSave())
-		{
-			if ($this->getIsNewRecord())
-				$this->created = date('Y-m-d H:i:s');
-
-			return true;
-		}
-		else
-			return false;
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-		);
+		$tableName = self::tableNameByCompany($company, self::baseTableName());
+		return "CREATE TABLE IF NOT EXISTS $tableName (
+  `id` BIGINT NOT NULL AUTO_INCREMENT ,
+  `message_id` BIGINT UNSIGNED NOT NULL ,
+  `schedule_on` DATETIME NOT NULL ,
+  `status` ENUM('pending','progress','sent') NOT NULL ,
+  `last_retry` DATETIME NULL ,
+  `sent_on` DATETIME NULL ,
+  INDEX `fk_group_message_occur_message1` (`message_id` ASC) ,
+  PRIMARY KEY (`id`) ,
+  INDEX `schedule` (`schedule_on` ASC) ,
+  INDEX `status` (`status` ASC) )
+ENGINE = MyISAM";
 	}
 }

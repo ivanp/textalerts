@@ -16,22 +16,24 @@ class GroupMessage extends CompanyActiveRecord
 	{
 		$tableName = self::tableNameByCompany($company, self::baseTableName());
 		return "CREATE  TABLE IF NOT EXISTS $tableName (
-  `id` INT NOT NULL AUTO_INCREMENT ,
-  `group_id` INT NOT NULL ,
-  `created` DATETIME NULL ,
-  `body` VARCHAR(160) NULL ,
-  `status` ENUM('draft','pending','sending','sent') NULL ,
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
+  `user_id` INT NOT NULL COMMENT 'Message creator' ,
+  `body` VARCHAR(160) NOT NULL ,
+  `type` ENUM('now','schedule') NOT NULL ,
+  `created_on` DATETIME NOT NULL ,
+  `updated_on` DATETIME NULL ,
+  `status` ENUM('draft','pending','progress','sent') NOT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_message_group1` (`group_id` ASC) ,
-  INDEX `created` (`created` ASC) 
-)
+  INDEX `fk_message_user1` (`user_id` ASC) ,
+  INDEX `type` (`type` ASC) ,
+  INDEX `status` (`status` ASC) )
 ENGINE = MyISAM";
 	}
 
 	public function rules()
 	{
 		return array(
-			array('body,group_id', 'required'),
+//			array('body,group_id', 'required'),
 		);
 	}
 
@@ -40,7 +42,9 @@ ENGINE = MyISAM";
 		if(parent::beforeSave())
 		{
 			if ($this->getIsNewRecord())
-				$this->created = date('Y-m-d H:i:s');
+				$this->created_on=date('Y-m-d H:i:s');
+			else
+				$this->updated_on=date('Y-m-d H:i:s');
 
 			return true;
 		}
@@ -51,24 +55,29 @@ ENGINE = MyISAM";
 	public function attributeLabels()
 	{
 		return array(
-			'group_id' => 'Group',
 			'body' => 'Message'
 		);
 	}
 
 	public function relations()
 	{
+		$groupModel=Group::modelByCompany($this->company);
+		$userModel=User::modelByCompany($this->company);
 		return array(
-			'group' => array(self::BELONGS_TO, $this->getCompanyClass('Group'), 'group_id'),
-			'logs' => array(self::HAS_MANY, $this->getCompanyClass('MessageLog'), 'message_id')
+			'recipients'=>array(self::MANY_MANY,get_class($groupModel),$groupModel->tableName().'(message_id,group_id)'),
+			'logs'=>array(self::HAS_MANY,$this->getCompanyClass('MessageLog'),'message_id'),
+			'schedule'=>array(self::HAS_ONE,$this->getCompanyClass('MessageSchedule'),'message_id'),
+			
 		);
+
 	}
 
-	public function addLog($type, $message)
+	public function log($type,$message)
 	{
-		$log = MessageLog::factoryByCompany($this->company);
-		$log->type = $type;
-		$log->body = $message;
+		$log=MessageLog::factoryByCompany($this->company);
+		$log->type=$type;
+		$log->body=$message;
+		$log->message_id=$this->id;
 		$log->save();
 	}
 }

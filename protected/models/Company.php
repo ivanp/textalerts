@@ -143,8 +143,11 @@ class Company extends CActiveRecord
 			// Create necessary tables
 			foreach ($this->_createModel as $class)
 			{
-				$sql = call_user_func(array($class, 'createSqlByCompany'), $this);
-				$connection->createCommand($sql)->execute();
+				$queries=call_user_func(array($class, 'createSqlByCompany'), $this);
+				if (!is_array($queries))
+					$queries=array($queries);
+				foreach($queries as $query)
+					$connection->createCommand($query)->execute();
 			}
 
 			$user = User::factoryByCompany($this);
