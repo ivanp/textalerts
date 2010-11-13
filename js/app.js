@@ -1,5 +1,12 @@
 var App = window.App || {};
 
+// Controllers methods define here
+App.modules = {
+		admin: {},
+		company: {},
+		front: {}
+};
+
 /** We will put all of our variables and resources (URL-s, listings etc) **/
 App.data = {};
 
@@ -233,8 +240,13 @@ jQuery.fn.highlightFade = function() {
   return this.effect("highlight", {}, 1000)
 };
 
-function ucfirst( str ) {
+App.ucfirst = function( str ) {
   str += '';
   var f = str.charAt(0).toUpperCase();
   return f + str.substr(1);
+};
+
+function ucfirst(str) {
+	return App.ucfirst(str);
 }
+
