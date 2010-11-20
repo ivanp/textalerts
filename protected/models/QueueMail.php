@@ -31,7 +31,9 @@ class QueueMail extends CActiveRecord
 					);
 					$this->id=$this->hash($uniqueid);
 				}
-				while (QueueMail::model()->findByPk($this->id)!==false);
+				while (QueueMail::model()->exists('id=:id',array(':id'=>$this->id)));
+
+				$this->created_on=time();
 			}
 			return true;
 		}

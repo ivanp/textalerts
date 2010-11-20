@@ -43,6 +43,11 @@ class MainApplication extends CWebApplication {
 
 //		$command = $this->db->createCommand('SET AUTOCOMMIT=0');
 //		$command->execute();
+
+
+		Yii::import("ext.yiiext.components.zendAutoloader.EZendAutoloader", true);
+		EZendAutoloader::$prefixes = array('Zend', 'Custom');
+		Yii::registerAutoloader(array("EZendAutoloader", "loadClass"));
 	}
 
 	public function createFrontUrl($route,$params=array(),$ampersand='&')
@@ -58,5 +63,13 @@ class MainApplication extends CWebApplication {
 	public function getCompany()
 	{
 		return $this->_company;
+	}
+	
+	public function getUTCObject()
+	{
+		static $object;
+		if (!isset($object))
+			$object=new DateTimeZone('UTC');
+		return $object;
 	}
 }

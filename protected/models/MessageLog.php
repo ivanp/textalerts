@@ -11,10 +11,9 @@ class MessageLog extends CompanyActiveRecord
 	{
 		$tableName = self::tableNameByCompany($company, self::baseTableName());
 		return "CREATE TABLE IF NOT EXISTS $tableName (
-  CREATE  TABLE IF NOT EXISTS `textalerts`.`message_log` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `message_id` BIGINT UNSIGNED NOT NULL ,
-  `time` DATETIME NULL ,
+  `time` INT NULL ,
   `type` ENUM('info','error') NULL ,
   `body` TEXT NULL ,
   INDEX `time` (`time` ASC) ,
@@ -33,7 +32,7 @@ ENGINE = MyISAM";
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'message' => array(self::BELONGS_TO, $this->getCompanyClass('GroupMessage'), 'message_id'),
+			'message' => array(self::BELONGS_TO, $this->getCompanyClass('Message'), 'message_id'),
 		);
 	}
 }

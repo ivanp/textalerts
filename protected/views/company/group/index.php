@@ -19,7 +19,6 @@ $roles = array('Member', 'Administrator', 'Sender', 'Non-member');
 		<tr>
 			<th width="50%">Name</th>
 			<th width="10%">Members</th>
-			<th>Last message</th>
 			<th>Your Subscription</th>
 		</tr>
 	</thead>
@@ -34,7 +33,6 @@ $roles = array('Member', 'Administrator', 'Sender', 'Non-member');
 				<?php endif; ?>
 			</td>
 			<td class="center"><?php echo $group->subscriberCount ?></td>
-			<td><?php echo $group->getLastMessageTime() ?></td>
 			<td>
 				<?php if (!Yii::app()->user->isGuest) {
 					$user = Yii::app()->user->record;

@@ -746,3 +746,10 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 	margin-top: 16px;
 }
 
+#sendselectgroup {
+	max-height: 160px;
+	display: block;
+	overflow: auto;
+	background-color: #eeeeee;
+	padding: 8px;
+}

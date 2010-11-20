@@ -21,17 +21,19 @@ class QueueText extends CActiveRecord
 			{
 				do
 				{
-					$uniqueid=sprintf('%d:%s:%s:%s:%s:%d',
+					$uniqueid=sprintf('%d:%s:%d:%s:%s:%d',
 							$this->company_id,
-							$this->from,
-							$this->to,
+							$this->number,
+							$this->carrier_id,
 							$this->created_on,
 							$this->hash($this->body),
 							++$count
 					);
 					$this->id=$this->hash($uniqueid);
 				}
-				while (QueueText::model()->findByPk($this->id)!==false);
+				while (QueueMail::model()->exists('id=:id',array(':id'=>$this->id)));
+
+				$this->created_on=time();
 			}
 			return true;
 		}

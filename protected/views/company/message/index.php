@@ -18,7 +18,7 @@ $this->breadcrumbs=array(
 			<th>ID#</th>
 			<th>Message</th>
 			<th>Created</th>
-			<th>Destinations</th>
+			<th>Groups</th>
 			<th>Status</th>
 		</tr>
 	</thead>
@@ -28,8 +28,8 @@ $this->breadcrumbs=array(
 		<tr>
 			<td><?php echo $msg->id?></td>
 			<td><?php echo htmlspecialchars($msg->body)?></td>
-			<td><?php echo $msg->created?></td>
-			<td><?php echo htmlspecialchars($msg->group->title)?></td>
+			<td><?php echo date('Y-m-d H:i:s', $msg->created_on)?></td>
+			<td>&nbsp;</td>
 			<td><?php echo $msg->status?></td>
 		</tr>
 		<?php } ?>

@@ -1,7 +1,7 @@
 <?php
 $cs = Yii::app()->clientScript;
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/datepicker.js'), CClientScript::POS_HEAD);
-
+$cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/jquery-ui-timepicker-addon.min.js'), CClientScript::POS_HEAD);
 
 $this->pageTitle=Yii::app()->name . ' - Create New Message';
 $this->breadcrumbs=array(
@@ -12,92 +12,84 @@ $this->breadcrumbs=array(
 ?>
 <h1>Send New Message</h1>
 
-<?php if(Yii::app()->user->hasFlash('contact')): ?>
+<?php if(Yii::app()->user->hasFlash('message-create')): ?>
 
 <div class="flash-success">
-	<?php echo Yii::app()->user->getFlash('contact'); ?>
+	<?php echo Yii::app()->user->getFlash('message-create'); ?>
 </div>
 
 <?php endif; ?>
 
 <div class="form">
-<?php $form=$this->beginWidget('CActiveForm', array(
+<?php $form=$this->beginWidget('CompanyForm', array(
 	'id'=>'message-form',
 	'enableAjaxValidation'=>false,
 ));
 	?>
 	<p class="note">Fields with <span class="required">*</span> are required.</p>
 
-	<?php echo $form->errorSummary($model); ?>
+	<?php echo $form->errorSummary($message); ?>
 
+	<fieldset>
+		<h3>Recipients</h3>
 	<div class="row">
-		<?php echo $form->labelEx($model,'group_id'); ?>
-		<?php echo $form->dropDownList($model,'group_id',$groups,array('prompt'=>'Select group:')); ?>
-		<?php echo $form->error($model,'group_id'); ?>
+		<?php echo $form->labelEx($message,'groups'); ?>
+		<span id="sendselectgroup" class="oneliner"><?php echo $form->checkBoxList($message,'groups',$groups,array('prompt'=>'Select group:')); ?></span>
+		<?php echo $form->error($message,'groups'); ?>
 	</div>
+	</fieldset>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'body'); ?>
-		<?php echo $form->textArea($model,'body',array('cols'=>40,'rows'=>4)); ?>
-		<?php echo $form->error($model,'body'); ?>
-	</div>
+	<fieldset>
+		<h3>Content</h3>
+		<div class="row">
+			<?php echo $form->labelEx($message,'body'); ?>
+			<?php echo $form->textArea($message,'body',array('cols'=>40,'rows'=>4)); ?>
+			<?php echo $form->error($message,'body'); ?>
+		</div>
+	</fieldset>
+
+	<fieldset>
+		<h3>Scheduling</h3>
+		<div id="schedule_type_row" class="row">
+			<?php echo $form->labelEx($message,'type'); ?>
+			<span class="oneliner"><?php echo $form->radioButtonList($message,'type',Message::getTypeOptions(),array()); ?></span>
+			<?php echo $form->error($message,'type'); ?>
+		</div>
+
+		<div id="schedule_fields">
+			<div class="row">
+				<?php echo $form->labelEx($message,'start'); ?>
+				<span class="oneliner">
+					<?php echo $form->dateTimeField($message,'start'); ?>
+				</span>
+				<?php echo $form->error($message,'start'); ?>
+			</div>
+
+			<div class="row">
+				<?php echo $form->labelEx($message,'repeatType'); ?>
+				<span class="oneliner"><?php echo $form->dropDownList($message,'repeatType',MessageSchedule::getRepeatTypes(),array('id'=>'msgRepeatType')); ?></span>
+				<?php echo $form->error($message,'repeatType'); ?>
+			</div>
+
+			<div class="row repeat_fields">
+				<?php echo $form->labelEx($message,'repeatEvery'); ?>
+				<?php echo $form->dropDownList($message,'repeatEvery', MessageSchedule::getRepeatEveryDays(),array('id'=>'msgRepeatEvery')); ?>
+				<?php echo $form->error($message,'repeatEvery'); ?>
+			</div>
+
+			<div class="row repeat_fields">
+				<?php echo $form->labelEx($message,'repeatUntil'); ?>
+				<?php echo $form->dateField($message,'repeatUntil'); ?>
+				<?php echo $form->error($message,'repeatUntil'); ?>
+			</div>
+		</div>
+	</fieldset>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Send now'); ?>
+		<?php echo CHtml::submitButton('Save Draft',array('name'=>'cmd_save')); ?> <?php echo CHtml::submitButton('Start Sending',array('name'=>'cmd_start')); ?>
 	</div>
 
-<!--	<div class="row">
-		<label>Group:</label>
-		<select>
-		</select>
-	</div>
-
-	<div class="row">
-	</div>
-
-	<div class="row oneliner">
-		<input type="radio" name="sendwhen" value="1" id="send_cb_1"/> <label for="send_cb_1">Send now</label>
-	</div>
-
-	<div class="row oneliner">
-		<input type="radio" name="sendwhen" value="2" id="send_cb_2"/> <label for="send_cb_2">Simple schedule:</label>
-		<select>
-			<option>Hourly</option>
-			<option>Daily</option>
-			<option>Weekly</option>
-			<option>Monthly</option>
-			<option>Yearly</option>
-		</select>
-	</div>
-	<div class="row">
-		
-	</div>
-
-	<div class="row oneliner">
-		<input type="radio" name="sendwhen" value="3" id="send_cb_3"/> <label for="send_cb_3">Advanced schedule</label>
-	</div>
-	<div class="row oneliner jcalendar jcalendar-selects">
-		<p id="calselect"></p>
-
-		<script type="text/javascript">
-			$(document).ready(function() {
-				$('#calselect').DatePicker({
-					flat: true,
-	date: [],
-	current: 
-	format: 'Y-m-d',
-	calendars: 1,
-	mode: 'multiple'
-				});
-			});
-		</script>
-	</div>
-
-	<div class="row oneliner">
-	</div>
-
-	<div class="row buttons">
-	</div>-->
+	
 
 <?php $this->endWidget(); ?>
 </div>

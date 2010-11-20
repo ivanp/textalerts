@@ -175,4 +175,23 @@ class SiteController extends CCompanyController
 		);
 	}
 
+	public function actionTest()
+	{
+//		$msg=Message::modelByCompany($this->company)->findByAttributes(array('id'=>3));
+//		var_dump(get_class($msg), get_class($msg->schedule));
+//
+//		$date=new Zend_Date();
+//		//$date->setTimezone('PST');
+//		$date->addYear(100);
+//		print $date."<br/>";
+//		$num=$date->get();
+//		$int=(float)$num;
+//		var_dump($num,$int);
+		//$date->setTime()
+		
+//		print $date;
+		$dt=new Zend_Date('dfgsdf');
+		print $dt->get('c');
+
+	}
 }

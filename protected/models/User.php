@@ -18,7 +18,7 @@ class User extends CompanyActiveRecord
   `id` INT NOT NULL AUTO_INCREMENT ,
   `first_name` VARCHAR(45) NULL ,
   `last_name` VARCHAR(45) NULL ,
-  `email` VARCHAR(45) NULL ,
+  `email` VARCHAR(255) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL ,
   `password` VARCHAR(45) NULL ,
   `created` VARCHAR(45) NULL ,
   `updated` DATETIME NULL ,

@@ -151,10 +151,12 @@ ENGINE = MyISAM";
 
 	public function relations()
 	{
+		$messageModel=Message::modelByCompany($this->company);
+		$msgGroupModel=MessageGroup::modelByCompany($this->company);
 		return array(
 			'subscribers' => array(self::HAS_MANY, $this->getCompanyClass('Subscription'), 'group_id'),
 			'subscriberCount' => array(self::STAT, $this->getCompanyClass('Subscription'), 'group_id'),
-			'messages'=>array(self::HAS_MANY,$this->getCompanyClass('GroupMessage'),'group_id')
+//			'messages'=>array(self::HAS_MANY,get_class($msgGroupModel),$msgGroupModel->tableName().'(group_id,message_id)')
 		);
 	}
 
@@ -224,7 +226,7 @@ ENGINE = MyISAM";
 	public function getLastMessageTime()
 	{
 		$message=current($this->messages(array('limit'=>1,'order'=>'created DESC')));
-		if ($message instanceof GroupMessage)
+		if ($message instanceof Message)
 			return $message->created;
 		else
 			return null;

@@ -41,33 +41,40 @@ class MessageController extends CCompanyController
 		if (!Yii::app()->user->checkAccess('SuperAdministrator') && !$this->company->isAdministrator($user) && !$this->company->isSender($user))
 			throw new CHttpException (401, 'Access Denied');
 
-		$model = GroupMessage::factoryByCompany($this->company);
-		$varname = get_class($model);
+		$message=Message::factoryByCompany($this->company);
+		$message->setScenario('create');
+		$varname = get_class($message);
 
 		if (isset($_POST[$varname]))
 		{
-			$model->attributes = $_POST[$varname];
-			$model->status = 'pending';
+			$message->attributes=$_POST[$varname];
+			if (isset($_POST['cmd_start']))
+				$message->status='pending';
+			else
+				$message->status='draft';
 
-			if ($model->save())
+			if ($message->save()) 
 			{
-				$queue = new MessageQueue;
-				$queue->company_id = $this->company->id;
-				$queue->message_id = $model->id;
-				$queue->save();
-
-				Yii::app()->user->setFlash('message', sprintf('New message to group "%s" has been created', $model->group->title));
-				$this->redirect(array('message/index'), true);
+				Yii::app()->user->setFlash('flash-success', 'Message has been created');
+				$this->redirect($this->createUrl('/message/index'), true);
 			}
 		}
+		else
+		{
+			$message->type='now';
+			$message->start=time();
+			$message->repeatUntil=time();
+		}
 
-		$groups = Group::modelByCompany($this->company)->findAll();
+		$crit=Group::modelByCompany($this->company)->getDbCriteria();
+		$crit->order='title';
+		$groups = Group::modelByCompany($this->company)->findAll($crit);
 		$group_select = array();
 		foreach ($groups as $group)
 			$group_select[$group->id] = $group->title;
 		$group_id = Yii::app()->getRequest()->getParam('group_id');
 		$this->render('create', array(
-			'model'	=> $model,
+			'message'	=> $message,
 			'groups' => $group_select,
 			'group_id' => $group_id
 		));
@@ -75,7 +82,7 @@ class MessageController extends CCompanyController
 
 	public function actionIndex($status = 'all')
 	{
-		$messages = GroupMessage::modelByCompany($this->company)->findAll();
+		$messages = Message::modelByCompany($this->company)->findAll();
 
 		$this->render('index', array(
 			'messages' => $messages
