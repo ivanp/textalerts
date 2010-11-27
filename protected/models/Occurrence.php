@@ -2,6 +2,9 @@
 
 class Occurrence extends CompanyActiveRecord
 {
+	private $startDate;
+	private $endDate;
+
 	public static function baseTableName()
 	{
 		return 'occurrence';
@@ -18,15 +21,11 @@ class Occurrence extends CompanyActiveRecord
 		return "CREATE TABLE IF NOT EXISTS $tableName (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `event_id` INT NOT NULL ,
-  `startdate` DATE NULL ,
-  `enddate` DATE NULL ,
-  `starttime` TIME NULL ,
-  `endtime` TIME NULL ,
-  `timetype` ENUM('normal','full','tba','none') NULL ,
+  `start` INT NULL ,
+  `end` INT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_table1_event1` (`event_id` ASC) ,
-  INDEX `startdate` (`startdate` ASC) ,
-  INDEX `enddate` (`enddate` ASC) )
+  INDEX `startdate` (`start` ASC) )
 ENGINE = MyISAM";
 	}
 
@@ -40,7 +39,7 @@ ENGINE = MyISAM";
 	public function rules()
 	{
 		return array(
-			array('timetype','in','range'=>array('normal','full','tda','none'))
+//			array('time_type','in','range'=>array('normal','full','tda','none'))
 		);
 	}
 
@@ -60,8 +59,8 @@ ENGINE = MyISAM";
 	public function between($start,$end)
 	{
 		$this->getDbCriteria()->mergeWith(array(
-			'condition'=>sprintf("startdate BETWEEN CAST('%s' AS DATETIME) AND CAST('%s' AS DATETIME)",$start,$end),
-			'order'=>'startdate ASC'
+			'condition'=>sprintf("start BETWEEN %d AND %d",$start,$end),
+			'order'=>'start ASC'
     ));
     return $this;
 	}
@@ -69,12 +68,31 @@ ENGINE = MyISAM";
 	public function upcoming($limit=10)
 	{
 		$this->getDbCriteria()->mergeWith(array(
-			'condition'=>"startdate >= NOW()",
-			'order'=>'startdate ASC',
+			'condition'=>"start >= ".time(),
+			'order'=>'start ASC',
 			'limit'=>$limit,
 			'group'=>'event_id ASC'
     ));
     return $this;
 	}
-}
 
+	public function getStartDate()
+	{
+		if (!isset($this->startDate))
+		{
+			$this->startDate=new Zend_Date();
+			$this->startDate->setTimestamp($this->start);
+		}
+		return $this->startDate;
+	}
+
+	public function getEndDate()
+	{
+		if (!isset($this->endDate))
+		{
+			$this->endDate=new Zend_Date();
+			$this->endDate->setTimestamp($this->end);
+		}
+		return $this->endDate;
+	}
+}

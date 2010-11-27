@@ -59,9 +59,7 @@ $this->breadcrumbs=array(
 		<div id="schedule_fields">
 			<div class="row">
 				<?php echo $form->labelEx($message,'start'); ?>
-				<span class="oneliner">
-					<?php echo $form->dateTimeField($message,'start'); ?>
-				</span>
+				<?php echo $form->dateTimeField($message,'start'); ?>
 				<?php echo $form->error($message,'start'); ?>
 			</div>
 

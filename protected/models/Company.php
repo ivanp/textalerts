@@ -58,16 +58,30 @@ class Company extends CActiveRecord
 		return User::modelByCompany($this)->findAll();
 	}
 
-	public function isAdministrator(User $user)
+	/**
+	 *
+	 * @param User $user
+	 * @return bool
+	 */
+	public function isAdministrator($user)
 	{
+		if (!$user instanceof User)
+			return false;
 		if ($user->id == $this->owner->id)
 			return true;
 		$admin = User::modelByCompany($this)->find('id=:user_id and level=:level', array(':user_id'=>$user->id,':level'=>'admin'));
 		return ($admin instanceof User);
 	}
 
-	public function isSender(User $user)
+	/**
+	 *
+	 * @param User $user
+	 * @return bool
+	 */
+	public function isSender($user)
 	{
+		if (!$user instanceof User)
+			return false;
 		$sender = User::modelByCompany($this)->find('id=:user_id and level=:level', array(':user_id'=>$user->id,':level'=>'sender'));
 		return ($sender instanceof User);
 	}

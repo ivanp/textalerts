@@ -5,12 +5,13 @@ class Event extends CompanyActiveRecord
 {
 	const MaxOccurrences=370; // why? it's magic numberr :p don't ask
 	// Fields that only appear at forms
-	public $startdate;
-	public $starttime;
-	public $enddate;
-	public $endtime;
-	public $time_type;
-	public $repeat_type;
+//	public $start;
+//	public $end;
+//	public $time_type;
+//	public $repeat_type;
+//	public $start_time;
+//	public $end_time;
+
 	public $repeat_every;
 	public $repeat_until;
 
@@ -18,6 +19,43 @@ class Event extends CompanyActiveRecord
 	{
 		return 'event';
 	}
+
+	public function __set($name,$value)
+	{
+		$map=array('start_time'=>'start','end_time'=>'end');
+		if (isset($map[$name]))
+		{
+			$var=$map[$name];
+			if (is_numeric($this->$var))
+				$date=new Zend_Date($this->$var,Zend_Date::TIMESTAMP);
+			else
+				$date=new Zend_Date($this->$var);
+			$time=new Zend_Date(strtotime($value),Zend_Date::TIMESTAMP);
+			$date->setHour($time);
+			$date->setMinute($time);
+			$date->setSecond(0);
+			$this->$var=$date->get();
+		}
+		else
+			parent::__set($name,$value);
+	}
+
+	public function __get($name)
+	{
+		$map=array('start_time'=>'start','end_time'=>'end');
+		if (isset($map[$name]))
+			return $this->$map[$name];
+		 else {
+			return parent::__get($name);
+		 }
+	}
+
+//	public function afterFind()
+//	{
+//		parent::afterFind();
+//		$this->start_time=$this->start;
+//		$this->end_time=$this->end;
+//	}
 
 	public static function modelByCompany(Company $company)
 	{
@@ -30,17 +68,30 @@ class Event extends CompanyActiveRecord
 		return "CREATE TABLE IF NOT EXISTS $tableName (
   `id` INT NOT NULL AUTO_INCREMENT ,
   `user_id` INT NOT NULL ,
-  `subject` VARCHAR(255) NULL ,
+  `subject` VARCHAR(255) NOT NULL ,
   `description` TEXT NULL ,
+  `time_type` ENUM('normal','fullday','tba','none') NOT NULL ,
+  `start` INT NOT NULL ,
+  `end` INT NOT NULL ,
+  `repeat_type` ENUM('never','daily','weekly','monthly','yearly') NOT NULL ,
+  `repeat_every` INT NULL ,
+  `repeat_until` INT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_event_user1` (`user_id` ASC) )
 ENGINE = MyISAM";
 	}
 
+	protected function afterDelete()
+	{
+	  Occurrence::modelByCompany($this->company)->deleteAllByAttributes(array('event_id'=>$this->id));
+	}
+
 	public function relations()
 	{
+		$occurrence=Occurrence::modelByCompany($this->company);
 		return array(
-			'occurrences'=>array(self::HAS_MANY,$this->getCompanyClass('Occurrence'),'event_id'),
+			'occurrences'=>array(self::HAS_MANY,$this->getCompanyClass('Occurrence'),'event_id',
+					'order'=>'occurrences.start'),
 			'creator'=>array(self::BELONGS_TO,$this->getCompanyClass('User'),'user_id')
 		);
 	}
@@ -48,60 +99,65 @@ ENGINE = MyISAM";
 	public function rules()
 	{
 		return array(
-			array('subject,time_type,time_type,repeat_type,startdate,enddate','required'),
-			array('startdate,enddate','validDate'),
-			array('starttime,endtime','validTime','allowEmpty'=>true),
+			array('subject,time_type,repeat_type,start,end','required'),
+			array('start,end','validDateTime'),
 			array('subject','length','min'=>3,'max'=>255),
 			array('time_type','in','range'=>array_keys($this->getTimeTypes())),
 			array('repeat_type','in','range'=>array_keys($this->getRepeatTypes())),
 			array('repeat_every','numerical','integerOnly'=>true,'min'=>1,'max'=>30,'allowEmpty'=>true),
-			array('repeat_until','validDate','allowEmpty'=>true),
+			array('repeat_until','validDateTime','allowEmpty'=>true),
+			array('start,end,repeat_until','filter','filter'=>array($this,'dateTimeToTimeStamp'),'on'=>'create,edit'),
+			array('start_time,end_time','safe','on'=>'create,edit')
 		);
 	}
 
-	public function validDate($attribute,$params)
+	public function validDateTime($attribute,$params)
 	{
 		if (isset($params['allowEmpty']) && $params['allowEmpty'] && empty($this->$attribute))
 			return;
-		list($year,$month,$day)=sscanf($this->$attribute,'%04u-%02u-%02u');
-		if (!checkdate($month,$day,$year))
+		try
+		{
+			$dateTime=new Zend_Date($this->$attribute);
+		}
+		catch (Zend_Date_Exception $e)
+		{
 			$this->addError($attribute,'Invalid date');
+		}
 	}
 
-	public function validTime($attribute,$params)
+	public function dateTimeToTimeStamp($dt)
 	{
-		if (isset($params['allowEmpty']) && $params['allowEmpty'] && empty($this->$attribute))
-			return;
-		list($hour,$minute)=sscanf($this->$attribute,'%02u-%02u');
-		if (!($hour<24 && $minute<60))
-			$this->addError($attribute,'Invalid time');
+		try
+		{
+			$dt=new Zend_Date($dt);
+			$value=$dt->get();
+		}
+		catch (Zend_Date_Exception $e)
+		{
+			$value=null;
+		}
+		return $value;
 	}
-
-
 
 	public function beforeSave()
 	{
 		if (parent::beforeSave())
 		{
-			$dt_start=$this->startdate;
-			$dt_end=$this->enddate;
-			if ($this->time_type=='normal')
+			$start=new Zend_Date();
+			$start->setTimestamp($this->start);
+			$end=new Zend_Date();
+			$end->setTimestamp($this->end);
+			if ($this->time_type!='normal')
 			{
-				$dt_start.=' '.$this->starttime;
-				$dt_end.=' '.$this->endtime;
+				$start->setTime('00:00:00');
+				$end->setTime('00:00:00');
 			}
-			else
-			{
-				// Since we do not require time, assign them null!
-				$this->starttime=null;
-				$this->endtime=null;
-			}
-			$dt_start=strtotime($dt_start);
-			$dt_end=strtotime($dt_end);
+			$this->start=$start->get();
+			$this->end=$end->get();
 			// Start must be greater or equal end *doh*
-			if ($dt_start>$dt_end)
+			if ($start->get()>$end->get())
 			{
-				$this->addError('enddate','Ending date must be the same or greater than starting date');
+				$this->addError('end','Ending date must be the same or greater than starting date');
 				return false;
 			}
 			if (!$this->user_id)
@@ -115,120 +171,57 @@ ENGINE = MyISAM";
 	public function afterSave()
 	{
 		parent::afterSave();
-		switch ($this->getScenario())
+		
+		$occModel=Occurrence::modelByCompany($this->company);
+		if ($this->getScenario()=='edit')
+			$occModel->deleteAllByAttributes(array('event_id'=>$this->id));
+
+		$occurrence=Occurrence::factoryByCompany($this->company);
+		$occurrence->event_id=$this->id;
+		$occurrence->start=$this->start;
+		$occurrence->end=$this->end;
+//		$occurrence->timetype=$this->time_type;
+		$occurrence->save();
+
+		if ($this->repeat_type!='never')
 		{
-			case 'insert':
+			$start=new Zend_Date();
+			$start->setTimestamp($this->start);
+			$end=new Zend_Date();
+			$end->setTimestamp($this->end);
+			$until=new Zend_Date();
+			$until->setTimestamp($this->repeat_until);
+			$until->setTime('23:59:59');
+			$occurrences=1;
+			switch ($this->repeat_type)
+			{
+				case 'daily':
+					$part=Zend_Date::DAY;
+					break;
+				case 'weekly':
+					$part=Zend_Date::WEEK;
+					break;
+				case 'monthly':
+					$part=Zend_Date::MONTH;
+					break;
+				case 'yearly':
+					$part=Zend_Date::YEAR;
+					break;
+			}
+
+			while ($occurrences <= self::MaxOccurrences)
+			{
+				$start->add($this->repeat_every, $part);
+				$end->add($this->repeat_every, $part);
+				if ($start->get() > $until->get())
+					break;
 				$occurrence=Occurrence::factoryByCompany($this->company);
 				$occurrence->event_id=$this->id;
-				$occurrence->startdate=$this->startdate;
-				$occurrence->starttime=$this->starttime;
-				$occurrence->enddate=$this->enddate;
-				$occurrence->endtime=$this->endtime;
-				$occurrence->timetype=$this->time_type;
+				$occurrence->start=$start->get();
+				$occurrence->end=$end->get();
+	//			$occurrence->timetype=$this->time_type;
 				$occurrence->save();
-
-				$start_time=strtotime($this->startdate.' '.$this->starttime);
-				$end_time=strtotime($this->enddate.' '.$this->endtime);
-				$until_time=strtotime($this->repeat_until.' 23:59:59');
-//				var_dump($this->startdate.' '.$this->starttime,$this->enddate.' '.$this->endtime);
-//				exit;
-				$occurrences=1;
-				switch($this->repeat_type)
-				{
-					case 'daily':
-						$ndays=$this->repeat_every;
-						while ($occurrences <= self::MaxOccurrences)
-						{
-							$start_time=self::add_days($start_time,$ndays);
-							$end_time=self::add_days($end_time,$ndays);
-//							var_dump(date('Y-m-d H:i:s', $start_time),date('Y-m-d H:i:s', $until_time));
-//							exit;
-							if ($start_time>$until_time)
-								break;
-							$occurrence=Occurrence::factoryByCompany($this->company);
-							$occurrence->event_id=$this->id;
-							$occurrence->timetype=$this->time_type;
-							$occurrence->startdate=date('Y-m-d',$start_time);
-							$occurrence->enddate=date('Y-m-d',$end_time);
-							if ($this->time_type=='normal')
-							{
-								$occurrence->starttime=date('H:i',$start_time);
-								$occurrence->endtime=date('H:i',$end_time);
-							}
-							$occurrence->save();
-							$occurrences++;
-						}
-						break;
-					case 'weekly':
-						$ndays=$this->repeat_every*7;
-						while ($occurrences <= self::MaxOccurrences)
-						{
-							$start_time=self::add_days($start_time,$ndays);
-							$end_time=self::add_days($end_time,$ndays);
-							if ($start_time>$until_time)
-								break;
-							$occurrence=Occurrence::factoryByCompany($this->company);
-							$occurrence->event_id=$this->id;
-							$occurrence->timetype=$this->time_type;
-							$occurrence->startdate=date('Y-m-d',$start_time);
-							$occurrence->enddate=date('Y-m-d',$end_time);
-							if ($this->time_type=='normal')
-							{
-								$occurrence->starttime=date('H:i',$start_time);
-								$occurrence->endtime=date('H:i',$end_time);
-							}
-							$occurrence->save();
-							$occurrences++;
-						}
-						break;
-					case 'monthly':
-						$nmonths=$this->repeat_every;
-						while ($occurrences <= self::MaxOccurrences)
-						{
-							$start_time=self::add_months($start_time,$nmonths);
-							$end_time=self::add_months($end_time,$nmonths);
-							if ($start_time>$until_time)
-								break;
-							$occurrence=Occurrence::factoryByCompany($this->company);
-							$occurrence->event_id=$this->id;
-							$occurrence->timetype=$this->time_type;
-							$occurrence->startdate=date('Y-m-d',$start_time);
-							$occurrence->enddate=date('Y-m-d',$end_time);
-							if ($this->time_type=='normal')
-							{
-								$occurrence->starttime=date('H:i',$start_time);
-								$occurrence->endtime=date('H:i',$end_time);
-							}
-							$occurrence->save();
-							$occurrences++;
-						}
-						break;
-					case 'yearly':
-						$nyears=$this->repeat_every;
-						while ($occurrences <= self::MaxOccurrences)
-						{
-							$start_time=self::add_years($start_time,$nyears);
-							$end_time=self::add_years($end_time,$nyears);
-							if ($start_time>$until_time)
-								break;
-							$occurrence=Occurrence::factoryByCompany($this->company);
-							$occurrence->event_id=$this->id;
-							$occurrence->timetype=$this->time_type;
-							$occurrence->startdate=date('Y-m-d',$start_time);
-							$occurrence->enddate=date('Y-m-d',$end_time);
-							if ($this->time_type=='normal')
-							{
-								$occurrence->starttime=date('H:i',$start_time);
-								$occurrence->endtime=date('H:i',$end_time);
-							}
-							$occurrence->save();
-							$occurrences++;
-						}
-						break;
-				}
-				break;
-			case 'update':
-				break;
+			}
 		}
 	}
 
@@ -236,7 +229,7 @@ ENGINE = MyISAM";
 	{
 		return array(
 			'normal'=>'Normal',
-			'full'=>'Full Day',
+			'fullday'=>'Full Day',
 			'tba'=>'To Be Announced',
 			'none'=>'None'
 		);

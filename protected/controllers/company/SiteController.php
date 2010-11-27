@@ -190,8 +190,12 @@ class SiteController extends CCompanyController
 		//$date->setTime()
 		
 //		print $date;
-		$dt=new Zend_Date('dfgsdf');
-		print $dt->get('c');
-
+//		$dt = new Zend_Date(strtotime('09:59 pm'), Zend_Date::TIMESTAMP);
+//		$now=Zend_Date::now();
+//		$now->setMinute($dt);
+		//$t=$dt->getHour()+1;
+		//var_dump($t);
+var_dump(date('Y-m-d H:i:s', 1290704400));
+		//var_dump(date('Y-m-d H:i:s', strtotime('09:59 am')));
 	}
 }

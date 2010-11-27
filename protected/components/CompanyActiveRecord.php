@@ -74,7 +74,7 @@ abstract class CompanyActiveRecord extends CActiveRecord
 	 * @return string
 	 */
 	public static function tableNameByCompany(Company $company, $tableName)
-	{
+	{ 
 		return $company->id.'_'.$tableName;
 	}
 

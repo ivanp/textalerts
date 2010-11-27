@@ -4,7 +4,10 @@ class EventController extends CCompanyController
 {
 	public function actionCreate()
 	{
+		if (Yii::app()->user->isGuest || !$this->company->isAdministrator(Yii::app()->user->record))
+			throw new CHttpException(401,'Access Denied');
 		$event=Event::factoryByCompany($this->company);
+		$event->setScenario('create');
 		$varname=get_class($event);
 		if (isset($_POST[$varname]))
 		{
@@ -17,17 +20,41 @@ class EventController extends CCompanyController
 		}
 		else
 		{
-			$dt = strtotime(date('Y-m-d H:00:00'));
-			$dt_from = strtotime('+1 hour', $dt);
-			$dt_to = strtotime('+2 hour', $dt);
-			// Fill with current date & time
-			$event->startdate=date('Y-m-d',$dt_from);
-			$event->enddate=date('Y-m-d',$dt_to);
-			$event->starttime=date('H:i',$dt_from);
-			$event->endtime=date('H:i',$dt_to);
+			$dt=new Zend_Date();
+			$dt->setMinute(0);
+			$dt->setSecond(0);
+			$dt->addHour(1);
+			$event->start=$dt->get();
+			$dt->addHour(1);
+			$event->end=$dt->get();
 		}
 
 		$this->render('create',array(
+			'event'=>$event
+		));
+	}
+
+	public function actionEdit($id)
+	{
+		if (Yii::app()->user->isGuest || !$this->company->isAdministrator(Yii::app()->user->record))
+			throw new CHttpException(401,'Access Denied');
+
+		$event=Event::modelByCompany($this->company)->with('occurrences')->findByPk($id);
+		if (!($event instanceof Event))
+			throw new CHttpException(404);
+		$event->setScenario('edit');
+		$varname=get_class($event);
+		if (isset($_POST[$varname]))
+		{
+			$event->attributes=$_POST[$varname];
+			if ($event->save())
+			{
+				Yii::app()->user->setFlash('calendar-index','Event has been updated');
+				$this->redirect(array('calendar/index'),true);
+			}
+		}
+
+		$this->render('edit',array(
 			'event'=>$event
 		));
 	}
@@ -65,13 +92,15 @@ class EventController extends CCompanyController
 		$this->render('view',$vars);
 	}
 
-	public function actionEdit($id)
-	{
-		$this->render('edit',array());
-	}
-
 	public function actionDelete($id)
 	{
-		$this->render('delete',array());
+		if (!$this->company->isAdministrator(Yii::app()->user->record))
+			throw new CHttpException(401,'Access Denied');
+		$event=Event::modelByCompany($this->company)->with('occurrences')->findByPk($id);
+		if (!($event instanceof Event))
+			throw new CHttpException(404);
+		$event->delete();
+		Yii::app()->user->setFlash('calendar-index','Event has been deleted');
+		$this->redirect(array('calendar/index'),true);
 	}
 }

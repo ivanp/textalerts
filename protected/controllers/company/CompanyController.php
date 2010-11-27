@@ -2,8 +2,29 @@
 
 class CompanyController extends CCompanyController
 {
+	public function filters()
+	{
+		return array(
+			'accessControl'
+		);
+	}
+
+	public function accessRules()
+	{
+		return array(
+				array('allow',
+						'users'=>array('@')
+				),
+				array('deny',
+					'users'=>array('?')),
+		);
+	}
+	
 	public function actionSettings()
 	{
+		if (!$this->company->isAdministrator(Yii::app()->user->record))
+			throw new CHttpException(401,'Access Denied');
+		
 		$company = $this->company;
 
 		$info = CompanyInfo::model()->findByPk($company->id);

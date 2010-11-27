@@ -79,7 +79,8 @@ class UserController extends CCompanyController
 		$this->redirect(Yii::app()->homeUrl);
 	}
 
-	public function actionRegister() {
+	public function actionRegister() 
+	{
 		$model = User::factoryByCompany($this->company);
 		$model->setScenario('register');
 		$varname = get_class($model);
@@ -106,9 +107,9 @@ class UserController extends CCompanyController
 				// Send e-mail
 				$mail = new Zend_Mail();
 				$mail->setBodyHtml($content);
-				$mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
+				$mail->setFrom($this->company->info->email_from);
 				$mail->addTo($model->email, $model->first_name.' '.$model->last_name);
-				$mail->setSubject('Registration on homeduck.com');
+				$mail->setSubject('Registration on '.HOSTNAME);
 				$mail->send();
 
 				Yii::app()->end();
@@ -144,7 +145,7 @@ class UserController extends CCompanyController
 				// Send e-mail
 				$mail = new Zend_Mail();
 				$mail->setBodyHtml($content);
-				$mail->setFrom(Yii::app()->params['adminEmail'], Yii::app()->name);
+				$mail->setFrom($this->company->info->email_from);
 				$mail->addTo($user->email, $user->getDisplayName());
 				$mail->setSubject('Password recovery on homeduck.com');
 				$mail->send();

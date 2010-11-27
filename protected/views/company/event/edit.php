@@ -1,8 +1,8 @@
 <?php
-$this->pageTitle=Yii::app()->name . ' - Create New Event';
+$this->pageTitle=Yii::app()->name . ' - Edit Event';
 $this->breadcrumbs=array(
 	'Calendar'=>array('/calendar/index'),
-	'Create New Event'
+	'Edit Event'
 );
 
 $cs=Yii::app()->getClientScript();
@@ -10,9 +10,9 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 ?>
 <h1>Create New Event</h1>
 
-<?php if(Yii::app()->user->hasFlash('event-create')): ?>
+<?php if(Yii::app()->user->hasFlash('event-edit')): ?>
 <div class="flash-success">
-	<?php echo Yii::app()->user->getFlash('event-create'); ?>
+	<?php echo Yii::app()->user->getFlash('event-edit'); ?>
 </div>
 <?php endif; ?>
 

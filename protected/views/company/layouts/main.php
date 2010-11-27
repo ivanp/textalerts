@@ -79,7 +79,7 @@ $company=$this->company;
 	<?php echo $content; ?>
 
 	<div id="footer">
-		Copyright &copy; 2010 TextAlerts Inc.
+		Copyright &copy; 2010 mychurchalerts.com
 	</div><!-- footer -->
 
 </div><!-- page -->

@@ -99,7 +99,7 @@ ENGINE = MyISAM";
 		}
 		catch (Zend_Date_Exception $e)
 		{
-			$value=false;
+			$value=null;
 		}
 		return $value;
 	}
