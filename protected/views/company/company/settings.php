@@ -14,7 +14,7 @@ $this->breadcrumbs=array(
 
 <div class="form">
 
-<?php $form=$this->beginWidget('CActiveForm'); ?>
+<?php $form=$this->beginWidget('CActiveForm',array('htmlOptions'=>array('enctype'=>'multipart/form-data'))); ?>
 
 	<?php echo $form->errorSummary(array($company, $info)); ?>
 
@@ -64,8 +64,23 @@ $this->breadcrumbs=array(
 	</div>
 
 	<div class="row">
+		<?php echo $form->labelEx($info,'bb_label'); ?>
+		<?php echo $form->textField($info,'bb_label'); ?>
+	</div>
+
+	<div class="row">
 		<?php echo $form->labelEx($info,'bb_text'); ?>
 		<?php echo $form->textArea($info,'bb_text',array('rows'=>6, 'cols'=>60)); ?>
+	</div>
+
+	<div class="row">
+		<?php echo $form->labelEx($info,'img_logo'); ?>
+		<span class="img_logo"><?php
+			$logo=$this->company->getLogoUrl();
+			if ($logo!==false)
+				echo CHtml::image($logo);
+			?></span>
+		<?php echo $form->fileField($info,'img_logo',array('rows'=>6, 'cols'=>60)); ?>
 	</div>
 
 	<div class="row buttons">

@@ -2,7 +2,7 @@
 return CMap::mergeArray(
 	require(dirname(__FILE__).'/main.php'),
 	array(
-
+		
 		// application components
 		'components'=>array(
 			'session' => array(
@@ -23,9 +23,16 @@ return CMap::mergeArray(
 				),
 			),
 			'errorHandler'=>array(
-				// use 'site/error' action to display errors
-							'errorAction'=>'site/error',
-					),
+			// use 'site/error' action to display errors
+					'errorAction'=>'site/error',
+			),
+			'image'=>array(
+					'class'=>'application.extensions.image.CImageComponent',
+					'driver'=>'GD'
+			)
 		),
+		'params'=>array(
+			'uploadDir'=>'application.upload'
+		)
 	)
 );

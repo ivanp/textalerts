@@ -25,17 +25,6 @@ class Company extends CActiveRecord
 	{
 		return array(
 			'info' => array(self::HAS_ONE, 'CompanyInfo', 'company_id'),
-//			'owner' => array(self::BELONGS_TO, 'User', 'user_id'),
-			
-//			'administrators' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
-//					'condition' => "level = 'admin'"
-//					),
-//			'senders' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
-//					'condition' => "level = 'sender'"
-//					),
-//			'members' => array(self::MANY_MANY, 'User', 'members(company_id, user_id)',
-//					'condition' => "level = 'member'"
-//					),
 		);
 	}
 
@@ -186,4 +175,31 @@ class Company extends CActiveRecord
 //		else
 //			return parent::__call($name, $parameters);
 //	}
+
+	public function getUploadDir()
+	{
+		$dir=Yii::getPathOfAlias(Yii::app()->params['uploadDir']).'/'.$this->id;
+		if (!is_dir($dir))
+		{
+			if (!mkdir($dir,0777,true))
+				throw new CException('Failed to create directory: '.$dir);
+		}
+		return $dir;
+	}
+ 
+	public function getLogoUrl()
+	{
+		$url=false;
+		if (!empty($this->info->img_logo))
+		{
+			$logo=$this->getUploadDir().'/'.$this->info->img_logo;
+			try
+			{
+				$url=Yii::app()->getAssetManager()->publish($logo);
+			}
+			catch (CException $e)
+			{}
+		}
+		return $url;
+	}
 }

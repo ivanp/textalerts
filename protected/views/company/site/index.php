@@ -20,34 +20,23 @@ $this->portlets[] = array(
 ?>
 <h2><?php echo $this->company->name?></h2>
 
-<?php
-//$this->widget('application.extensions.fullcalendar.FullcalendarGraphWidget',
-//    array(
-//        'data'=>array(
-//               'title'=> 'All Day Event',
-//                'start'=> date('Y-m-j')
-//        ),
-//        'options'=>array(
-//            'editable'=>false,
-//        ),
-//        'htmlOptions'=>array(
-//               'style'=>'width:700px;margin: 0 auto;'
-//        ),
-//    )
-//);
-?>
+	<?php
+	$label=$this->company->info->bb_label;
+	if (empty($label))
+		$label='Bulletin Board'; // default label
+
+			$this->beginWidget('zii.widgets.CPortlet', array(
+				'title'=>$label,
+			));
+			echo $this->company->info->bb_text;
+			$this->endWidget();
+		?>
 
 <div style="width:700px;margin: 0 auto;" id="fullcalendar"></div>
 
 <div class="clear" style="height: 16px"></div>
 
-	<?php
-			$this->beginWidget('zii.widgets.CPortlet', array(
-				'title'=>'Bulletin Board',
-			));
-			echo $this->company->info->bb_text;
-			$this->endWidget();
-		?>
+
 
 
 <script>

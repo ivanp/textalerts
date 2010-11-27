@@ -1,10 +1,12 @@
 <?php
-$cs = Yii::app()->getClientScript();
+$cs=Yii::app()->getClientScript();
 
 $cs->registerCoreScript('jquery');
 $cs->registerCoreScript('jquery.ui');
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/superfish.js'), CClientScript::POS_HEAD);
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/app.js'), CClientScript::POS_HEAD);
+
+$company=$this->company;
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -52,7 +54,14 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 <div class="container" id="page">
 
 	<div id="header">
-		<div id="logo"><a href="<?php echo $this->createUrl('/'); ?>"><?php echo htmlentities($this->company->info->heading); ?></a></div>
+		<div id="logo"><a href="<?php echo $this->createUrl('site/index'); ?>"><?php
+		$logo=$company->getLogoUrl();
+		$heading=htmlentities($this->company->info->heading);
+		if ($logo!==false) {
+			echo CHtml::image($logo,$heading);
+		} else {
+			echo $heading;
+		} ?></a></div>
 	</div><!-- header -->
 
 	<div id="mainmenu">

@@ -12,7 +12,12 @@ class QueueText extends CActiveRecord
 		return 'queue_text';
 	}
 
-	public function beforeSave()
+	protected function afterSave()
+	{
+		parent::afterSave();
+	}
+
+	protected function beforeSave()
 	{
 		static $count=0;
 		if (parent::beforeSave())

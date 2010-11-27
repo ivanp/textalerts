@@ -29,8 +29,8 @@ class Subscription extends CompanyActiveRecord
   INDEX `fk_group_users_group1` (`group_id` ASC) ,
   INDEX `fk_group_users_user1` (`user_id` ASC) ,
   INDEX `mail` (`mail` ASC) ,
-  INDEX `text` (`text` ASC) 
-  ) ENGINE = MyISAM";
+  INDEX `text` (`text` ASC) )
+ENGINE = MyISAM";
 	}
 
 	public function relations()

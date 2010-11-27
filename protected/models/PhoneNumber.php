@@ -35,7 +35,7 @@ class PhoneNumber extends CompanyActiveRecord
   `code` VARCHAR(10) NULL ,
   `confirmed` TINYINT(1) NULL ,
   INDEX `fk_table1_user1` (`user_id` ASC) ,
-  INDEX `fk_phone_carrier1` (`carrier_id` ASC))
+  INDEX `fk_phone_carrier1` (`carrier_id` ASC) )
 ENGINE = MyISAM";
 	}
 

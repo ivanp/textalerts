@@ -33,14 +33,13 @@ class MessageController extends CCompanyController
 	public function init()
 	{
 		parent::init();
+		$user = Yii::app()->user->record;
+		if (!Yii::app()->user->checkAccess('SuperAdministrator') && !$this->company->isAdministrator($user) && !$this->company->isSender($user))
+			throw new CHttpException (401, 'Access Denied');
 	}
 
 	public function actionCreate()
 	{
-		$user = Yii::app()->user->record;
-		if (!Yii::app()->user->checkAccess('SuperAdministrator') && !$this->company->isAdministrator($user) && !$this->company->isSender($user))
-			throw new CHttpException (401, 'Access Denied');
-
 		$message=Message::factoryByCompany($this->company);
 		$message->setScenario('create');
 		$varname = get_class($message);

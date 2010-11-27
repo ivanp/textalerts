@@ -18,7 +18,8 @@ return CMap::mergeArray(
 		'application.models.*',
 		'application.components.*',
 		'application.models.forms.*',
-		'application.vendors.*'
+		'application.vendors.*',
+		'application.extensions.helpers.*',
 //		'application.modules.srbac.controllers.SBaseController',
 //		'application.modules.srbac.*'
 	),

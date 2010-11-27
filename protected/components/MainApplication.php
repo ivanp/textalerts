@@ -34,7 +34,7 @@ class MainApplication extends CWebApplication {
 			if (in_array($host, $this->params['redirectHosts']))
 				$this->getRequest()->redirect($this->createFrontUrl('site/index'), true, 301);
 
-			$company = Company::model()->find('host = :host', array(':host' => $host));
+			$company = Company::model()->with('info')->find('host = :host', array(':host' => $host));
 			if ($company instanceof Company)
 				$this->_company = $company;
 			else

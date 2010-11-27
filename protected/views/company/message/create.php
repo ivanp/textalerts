@@ -86,7 +86,7 @@ $this->breadcrumbs=array(
 	</fieldset>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Save Draft',array('name'=>'cmd_save')); ?> <?php echo CHtml::submitButton('Start Sending',array('name'=>'cmd_start')); ?>
+		<?php //echo CHtml::submitButton('Save Draft',array('name'=>'cmd_save')); ?> <?php echo CHtml::submitButton('Start Sending',array('name'=>'cmd_start')); ?>
 	</div>
 
 	

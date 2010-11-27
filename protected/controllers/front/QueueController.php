@@ -14,70 +14,34 @@ class QueueController extends CFrontController
 		SwiftMailer::init();
 	}
 
-	public function actionProcess()
+	public function actionProcessmail()
 	{
-		$queues = MessageQueue::model()->with('company')->findAll(array('limit'=>100));
-		if (empty($queues))
-			die('No queues');
-		$queue_pool = array();
-		error_log('Pooling queues');
-		foreach ($queues as $q)
-		{
-			$message = $q->getMessage();
-			if ($message->status=='pending')
-			{
-				// Change to 'sending' rite away!
-				$message->status='sending';
-				$message->save();
-				$queue_pool[] = $q;
-				if (count($queue_pool) >= self::QueuesPerRequest)
-					break;
-			}
-		}
-		error_log(sprintf('Gathered %d queues in pool', count($queue_pool)));
+		header('Content-type: text/plain');
 
-		$ids = array();
-		foreach ($queue_pool as $q)
+		$queues=QueueMail::model()->with('company')->findAll('status = :status and schedule_on <= :schedule',
+				array(':status'=>'created','schedule'=>time()));
+		
+		foreach ($queues as $queue)
 		{
-			$company = $q->company;
-			$message = $q->getMessage();
-			$group = $message->group;
-			foreach ($group->subscribers as $subscriber)
-			{
-				$user = $subscriber->user;
+			$queue->status='sending';
+			$queue->save(); // like, right now!
 
-				if ($subscriber->mail)
-					$this->sendMail($message, $user);
-				if ($subscriber->text)
-					$this->sendText($message, $user);
-			}
-			// Mark message as sent
-			$message->status='sent';
-			$message->save();
-			// Delete the queue
-			$q->delete();
+			$company=$queue->company;
+			$from_mail=$company->info->email_from;
+			$from_name=$company->name;
+
+			echo sprintf("Sending mail to %s\n",$queue->to);
+			CompanyMailer::sendMessage(
+				array($from_mail=>$from_name),
+				$queue->to,
+				$queue->body,
+				$queue->subject
+			);
+
+			$queue->status='sent';
+			$queue->save();
 		}
 	}
 
-	protected function sendMail(GroupMessage $message, User $user)
-	{
-		$company = $user->company;
-		$company_info = $company->info;
-		$from_mail = $company_info->email_from;
-		$from_name = $company->name;
-
-		CompanyMailer::sendMessage(array($from_mail=>$from_name),$user->email, $message->body, $company->name);
-	}
-
-	protected function sendText(GroupMessage $message, User $user)
-	{
-		if (!$user->havePhoneNumber() || !$user->phoneNumberConfirmed())
-		{
-			$message->addLog('error', sprintf('User %d does not have phone number or not confirmed yet', $user->id));
-			return;
-		}
-
-		$to_mail = $user->phone->getSmsMailGateway();
-		CompanyMailer::sendMessage(array($to_mail), $message->body);
-	}
+	
 }

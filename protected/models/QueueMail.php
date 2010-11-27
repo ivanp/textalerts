@@ -12,7 +12,7 @@ class QueueMail extends CActiveRecord
 		return 'queue_mail';
 	}
 
-	public function beforeSave() 
+	protected function beforeSave()
 	{
 		static $count=0;
 		if (parent::beforeSave())

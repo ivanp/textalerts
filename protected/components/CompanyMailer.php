@@ -28,13 +28,9 @@ class CompanyMailer extends CComponent
 		return self::$_mailer;
 	}
 
-	static public function sendMessage($from, $to, $body, $subject=null)
+	static public function sendMessage($from, $to, $body, $subject)
 	{
 		$instance = self::instance();
-		$company = Yii::app()->getCompany();
-		$company_info = $company->info;
-		if ($subject===null)
-			$subject=$company_info->title;
 		$message = Swift_Message::newInstance($subject)
 			->setFrom($from)
 			->setTo($to)

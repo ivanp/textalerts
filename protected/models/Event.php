@@ -33,7 +33,7 @@ class Event extends CompanyActiveRecord
   `subject` VARCHAR(255) NULL ,
   `description` TEXT NULL ,
   PRIMARY KEY (`id`) ,
-  INDEX `fk_event_user1` (`user_id` ASC))
+  INDEX `fk_event_user1` (`user_id` ASC) )
 ENGINE = MyISAM";
 	}
 

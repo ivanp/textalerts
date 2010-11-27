@@ -23,10 +23,12 @@ class CompanyInfo extends CActiveRecord
 	{
 		return array(
 			array('heading,title,email_from,email_server', 'required'),
+			array('bb_label','length','max'=>100),
 //			array('company_id', 'required', 'on'=>'insert'),
 			array('company_id', 'unsafe', 'on'=>'update'),
 			array('email_pass,use_eztext,eztext_user,eztext_pass,bb_text', 'safe'),
 			array('email_from', 'email'),
+			array('img_logo', 'file', 'types'=>'jpg, gif, png','allowEmpty'=>true)
 		);
 	}
 
@@ -37,7 +39,10 @@ class CompanyInfo extends CActiveRecord
 			'title'=>'Title Text',
 			'use_eztext'=>'Use EZ Texting Gateway for texts',
 			'eztext_user'=>'EZ Texting User Name',
-			'eztext_pass'=>'EZ Texting Password'
+			'eztext_pass'=>'EZ Texting Password',
+			'img_logo'=>'Logo picture',
+			'bb_label'=>'Bulletin Board Label',
+			'bb_text'=>'Bulletin Board Text'
 		);
 	}
 
@@ -45,9 +50,10 @@ class CompanyInfo extends CActiveRecord
 	{
 		if (parent::beforeSave())
 		{
+			if (!strlen($this->img_logo))
+				unset($this->img_logo);
 			if ($this->use_eztext)
 			{
-				
 				if (empty($this->eztext_user))
 					$this->addError('eztext_user', 'You must provide username for EzText');
 				if (empty($this->eztext_pass))

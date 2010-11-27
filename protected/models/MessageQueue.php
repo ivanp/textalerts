@@ -20,7 +20,6 @@ class MessageQueue extends CompanyActiveRecord
 	{
 		$tableName = self::tableNameByCompany($company, self::baseTableName());
 		return "CREATE TABLE IF NOT EXISTS $tableName (
-  CREATE  TABLE IF NOT EXISTS `textalerts`.`message_queue` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `message_id` BIGINT UNSIGNED NOT NULL ,
   `schedule_on` INT NOT NULL ,
@@ -48,11 +47,9 @@ ENGINE = MyISAM";
 		// Main group loop
 		foreach ($message->recipients as $group)
 		{
-			error_log(sprintf('Looping thru group #%d',$group->id));
 			foreach ($group->subscribers as $subscriber)
 			{
 				$user=$subscriber->user;
-				error_log(sprintf('Looping thru user %d',$user->id));
 				if (in_array($user->id,$user_pool))
 					continue;
 				$user_pool[]=$user->id;
@@ -70,13 +67,23 @@ ENGINE = MyISAM";
 				}
 				if ($subscriber->text && $user->isPhoneConfirmed())
 				{
-					$queue=new QueueText();
+					/* COMMENTED TEMPORARILY */
+//					$queue=new QueueText();
+//					$queue->company_id=$this->company->id;
+//					$queue->body=$message->body;
+//					$queue->schedule_on=$this->schedule_on;
+//					$queue->status='created';
+//					$queue->number=$user->phone->number;
+//					$queue->carrier_id=$user->phone->carrier_id;
+//					$queue->save();
+					$queue=new QueueMail();
 					$queue->company_id=$this->company->id;
+					$queue->to=$user->phone->getSmsMailGateway();
+					$queue->subject=$company_info->title;
+					$queue->from=$company_info->email_from;
 					$queue->body=$message->body;
 					$queue->schedule_on=$this->schedule_on;
 					$queue->status='created';
-					$queue->number=$user->phone->number;
-					$queue->carrier_id=$user->phone->carrier_id;
 					$queue->save();
 				}
 			}

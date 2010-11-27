@@ -43,8 +43,8 @@ App.widgets.SubscriptionCheckbox = {
 		var cb_text = container.find('input.cb_text');
 		cb_text.click(function() {
 			var loading_img = $('<img class="loading" src="/images/loading.gif"/>');
-			cb_mail.hide();
-			cb_mail.before(loading_img);
+			cb_text.hide();
+			cb_text.before(loading_img);
 			$.ajax({
 				url: params.url,
 				type: 'POST',
@@ -52,17 +52,17 @@ App.widgets.SubscriptionCheckbox = {
 					group_id: cb_info.group_id,
 					user_id: cb_info.user_id,
 					type: "text",
-					command: cb_mail.attr('checked') ? "subscribe" : "unsubscribe"
+					command: cb_text.attr('checked') ? "subscribe" : "unsubscribe"
 				},
 				success: function() {
-					cb_mail.show();
+					cb_text.show();
 					loading_img.remove();
 				},
 				error: function() {
 					alert("Error - please try again");
-					cb_mail.attr('checked', cb_mail.attr('checked') ? "" : "checked");
+					cb_text.attr('checked', cb_text.attr('checked') ? "" : "checked");
 					loading_img.remove();
-					cb_mail.show();
+					cb_text.show();
 				}
 			});
 		});

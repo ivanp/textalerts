@@ -17,9 +17,7 @@ class Group extends CompanyActiveRecord
   `description` TEXT NULL ,
   `created` DATETIME NULL ,
   `updated` DATETIME NULL ,
-  PRIMARY KEY (`id`) ,
-  UNIQUE INDEX `name` (`name` ASC) ,
-  INDEX `title` (`title` ASC) )
+  PRIMARY KEY (`id`) )
 ENGINE = MyISAM";
 	}
 
