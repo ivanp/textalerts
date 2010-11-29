@@ -18,11 +18,13 @@ class QueueController extends CFrontController
 	{
 		header('Content-type: text/plain');
 
-		$queues=QueueMail::model()->with('company')->findAll('status = :status and schedule_on <= :schedule',
-				array(':status'=>'created','schedule'=>time()));
-		
-		foreach ($queues as $queue)
+		while (1) 
 		{
+			$queue=QueueMail::model()->with('company')->find('status = :status and schedule_on <= :schedule',
+				array(':status'=>'created','schedule'=>time()));
+			if (!($queue instanceof QueueMail))
+				break;
+			
 			$queue->status='sending';
 			$queue->save(); // like, right now!
 
@@ -30,7 +32,6 @@ class QueueController extends CFrontController
 			$from_mail=$company->info->email_from;
 			$from_name=$company->name;
 
-			echo sprintf("Sending mail to %s\n",$queue->to);
 			CompanyMailer::sendMessage(
 				array($from_mail=>$from_name),
 				$queue->to,
@@ -41,6 +42,13 @@ class QueueController extends CFrontController
 			$queue->status='sent';
 			$queue->save();
 		}
+//		$queues=QueueMail::model()->with('company')->findAll('status = :status and schedule_on <= :schedule',
+//				array(':status'=>'created','schedule'=>time()));
+//		
+//		foreach ($queues as $queue)
+//		{
+//			
+//		}
 	}
 
 	

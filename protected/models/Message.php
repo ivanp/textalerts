@@ -131,6 +131,35 @@ ENGINE = MyISAM";
 	{
 		if(parent::beforeSave())
 		{
+			// Only do these at 'create' or 'edit' scenario
+			if (in_array($this->getScenario(),array('create','edit')))
+			{
+				// Schedule message only
+				if ($this->type==self::SendTypeSchedule)
+				{
+					$now=time();
+					// Start time must be in the future
+					if ($this->start < $now)
+					{
+						$this->addError('start','Cannot schedule on the past');
+						return false;
+					}
+					// "Repeat until" must be ahead of start time
+					if ($this->repeatType != MessageSchedule::RepeatNone &&  
+							is_numeric($this->repeatUntil))
+					{
+						$until_dt=new Zend_Date($this->repeatUntil,Zend_Date::TIMESTAMP);
+						$until_dt->setHour(23);
+						$until_dt->setMinute(59);
+						$until_dt->setSecond(59);
+						if ($until_dt->get() < $this->start)
+						{
+							$this->addError('repeatUntil','Repeat until must be greater than start time');
+							return false;
+						}
+					}
+				}
+			}
 			if ($this->getIsNewRecord())
 			{
 				$this->created_on=time();
@@ -161,210 +190,216 @@ ENGINE = MyISAM";
 		else
 			return false;
 	}
+	
+	protected function afterFind() 
+	{
+		parent::afterFind();
+		foreach ($this->recipients as $group)
+			$this->groups[] = $group->id;
+		$schedule=$this->schedule;
+		$this->start=$schedule->start;
+		$this->repeatType=$schedule->repeat_type;
+		$this->repeatEvery=$schedule->repeat_every;
+		$this->repeatUntil=$schedule->repeat_until;
+	}
+	
+	protected function afterDelete() 
+	{
+		parent::afterDelete();
+		$this->deleteRelatedRows();
+	}
+	
+	protected function deleteRelatedRows()
+	{
+		MessageSchedule::modelByCompany($this->company)
+						->deleteAllByAttributes(array('message_id'=>$this->id));
+		MessageGroup::modelByCompany($this->company)
+						->deleteAllByAttributes(array('message_id'=>$this->id));
+		$queues=MessageQueue::modelByCompany($this->company)->findAllByAttributes(array('message_id'=>$this->id));
+		foreach ($queues as $queue)
+			$queue->delete(); // Must delete manually per-row to execute afterDelete()
+	}
 
 	protected function afterSave()
 	{
 		parent::afterSave();
-		$scheduleModel=MessageSchedule::modelByCompany($this->company);
-		switch($this->getScenario())
+		if ($this->getScenario()=='edit') 
+			$this->deleteRelatedRows();
+		// Insert groups
+		$this->rebuildGroup();
+		// Insert Schedule
+		$schedule=MessageSchedule::factoryByCompany($this->company);
+		$schedule->setScenario('create');
+		$schedule->message_id=$this->id;
+		if ($this->type=='schedule')
 		{
-			case 'create':
-				$this->rebuildGroup();
-				$schedule=MessageSchedule::factoryByCompany($this->company);
-				$schedule->setScenario('create');
-				$schedule->message_id=$this->id;
-				if ($this->type=='schedule')
-				{
-					$schedule->start=$this->start;
-					$schedule->repeat_type=$this->repeatType;
-					$schedule->repeat_every=$this->repeatEvery;
-					$schedule->repeat_until=$this->repeatUntil;
-				}
-				else
-				{
-					$schedule->start=time();
-					$schedule->repeat_type='none';
-				}
-				$schedule->save();
-				$this->schedule=$schedule;
-				break;
-			case 'edit':
-				$this->rebuildGroup();
-				$schedule=$this->schedule;
-				$schedule->setScenario('edit');
-				if ($this->type=='schedule')
-				{
-					$schedule->start=$this->start;
-					$schedule->repeat_type=$this->repeatType;
-					$schedule->repeat_every=$this->repeatEvery;
-					$schedule->repeat_until=$this->repeatUntil;
-				}
-				else
-				{
-					$schedule->start=time();
-					$schedule->repeat_type='none';
-					$schedule->repeat_every=1;
-					$schedule->repeat_until=null;
-				}
-				$schedule->save();
-				$this->schedule=$schedule;
-				break;
-		}
-	}
-
-	public function rebuildQueue()
-	{
-		$queueModel=MessageQueue::modelByCompany($this->company);
-		$scheduleModel=MessageSchedule::modelByCompany($this->company);
-		// Delete all previously created queues
-		$queueModel->deleteAllByAttributes(array('message_id'=>$this->id));
-		if ($this->type=='now')
-		{
-			// Remove schedule data since we're no longer need'em
-		  $scheduleModel->deleteAllByAttributes(array('message_id'=>$this->id));
-		}
-//		$this->generateQueue();
-//	}
-//
-//	public function generateQueue()
-//	{
-//		$queueModel=MessageQueue::modelByCompany($this->company);
-
-		if ($this->type=='now')
-		{
-			// No scheduling, send it now!
-			$queue=MessageQueue::factoryByCompany($this->company);
-			$queue->message_id=$this->id;
-			$queue->schedule_on=time();
-			$queue->status='pending';
-			$queue->save();
+			$schedule->start=$this->start;
+			$schedule->repeat_type=$this->repeatType;
+			$schedule->repeat_every=$this->repeatEvery;
+			$schedule->repeat_until=$this->repeatUntil;
 		}
 		else
 		{
-			// Prep date variables for comparisons etc
-			$start_dt=new Zend_Date($this->start, Zend_Date::TIMESTAMP);
-
-			// If repeatUntil was set
-			if ($this->repeatUntil!==null)
-			{
-				$until_dt=new Zend_Date($this->repeatUntil, Zend_Date::TIMESTAMP);
-				$until_dt->setHour(23);
-				$until_dt->setMinute(59);
-				$until_dt->setSecond(59);
-			}
-			else
-			{
-				$until_dt=Zend_Date::now();
-				switch ($this->repeatType)
-				{
-					case 'daily':
-					case 'weekly':
-						$until_dt->addYear(2);
-						break;
-					case 'monthly':
-						$until_dt->addYear(5);
-						break;
-					case 'yearly':
-						$until_dt->addYear(10);
-						break;
-				}
-			}
-
-			$queue=MessageQueue::factoryByCompany($this->company);
-			$queue->message_id=$this->id;
-			$queue->schedule_on=$this->start;
-			$queue->status='pending';
-			$queue->save();
-
-			$queue_dt=clone $start_dt;
-
-			if ($this->repeatType=='none')
-				return;
-			switch ($this->repeatType)
-			{
-				case 'daily':
-
-			}
-
-			while (true)
-			{
-				
-			}
-
-			switch($this->repeatType)
-			{
-				case 'daily':
-					while (true)
-					{
-						$queue_dt->addDay($this->repeatEvery);
-						if ($queue_dt->get() > $until_dt->get())
-							break;
-						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
-								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
-						{
-							$queue=MessageQueue::factoryByCompany($this->company);
-							$queue->message_id=$this->id;
-							$queue->schedule_on=$queue_dt->get();
-							$queue->status='pending';
-							$queue->save();
-						}
-					}
-					break;
-				case 'weekly':
-					while (true)
-					{
-						$queue_dt->addWeek($this->repeatEvery);
-						if ($queue_dt->get() > $until_dt->get())
-							break;
-						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
-								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
-						{
-							$queue=MessageQueue::factoryByCompany($this->company);
-							$queue->message_id=$this->id;
-							$queue->schedule_on=$queue_dt->get();
-							$queue->status='pending';
-							$queue->save();
-						}
-					}
-					break;
-				case 'monthly':
-					while (true)
-					{
-						$queue_dt->addMonth($this->repeatEvery);
-						if ($queue_dt->get() > $until_dt->get())
-							break;
-						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
-								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
-						{
-							$queue=MessageQueue::factoryByCompany($this->company);
-							$queue->message_id=$this->id;
-							$queue->schedule_on=$queue_dt->get();
-							$queue->status='pending';
-							$queue->save();
-						}
-					}
-					break;
-				case 'yearly':
-					while (true)
-					{
-						$queue_dt->addYear($this->repeatEvery);
-						if ($queue_dt->get() > $until_dt->get())
-							break;
-						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
-								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
-						{
-							$queue=MessageQueue::factoryByCompany($this->company);
-							$queue->message_id=$this->id;
-							$queue->schedule_on=$queue_dt->get();
-							$queue->status='pending';
-							$queue->save();
-						}
-					}
-					break;
-				default: // No repeating
-			}
+			$schedule->start=time();
+			$schedule->repeat_type='none';
 		}
+		$schedule->save();
+		$this->schedule=$schedule;
 	}
+
+//	public function rebuildQueue()
+//	{
+//		$queueModel=MessageQueue::modelByCompany($this->company);
+//		$scheduleModel=MessageSchedule::modelByCompany($this->company);
+//		// Delete all previously created queues
+//		$queueModel->deleteAllByAttributes(array('message_id'=>$this->id));
+//		if ($this->type=='now')
+//		{
+//			// Remove schedule data since we're no longer need'em
+//		  $scheduleModel->deleteAllByAttributes(array('message_id'=>$this->id));
+//		}
+////		$this->generateQueue();
+////	}
+////
+////	public function generateQueue()
+////	{
+////		$queueModel=MessageQueue::modelByCompany($this->company);
+//
+//		if ($this->type=='now')
+//		{
+//			// No scheduling, send it now!
+//			$queue=MessageQueue::factoryByCompany($this->company);
+//			$queue->message_id=$this->id;
+//			$queue->schedule_on=time();
+//			$queue->status='pending';
+//			$queue->save();
+//		}
+//		else
+//		{
+//			// Prep date variables for comparisons etc
+//			$start_dt=new Zend_Date($this->start, Zend_Date::TIMESTAMP);
+//
+//			// If repeatUntil was set
+//			if ($this->repeatUntil!==null)
+//			{
+//				$until_dt=new Zend_Date($this->repeatUntil, Zend_Date::TIMESTAMP);
+//				$until_dt->setHour(23);
+//				$until_dt->setMinute(59);
+//				$until_dt->setSecond(59);
+//			}
+//			else
+//			{
+//				$until_dt=Zend_Date::now();
+//				switch ($this->repeatType)
+//				{
+//					case 'daily':
+//					case 'weekly':
+//						$until_dt->addYear(2);
+//						break;
+//					case 'monthly':
+//						$until_dt->addYear(5);
+//						break;
+//					case 'yearly':
+//						$until_dt->addYear(10);
+//						break;
+//				}
+//			}
+//
+//			$queue=MessageQueue::factoryByCompany($this->company);
+//			$queue->message_id=$this->id;
+//			$queue->schedule_on=$this->start;
+//			$queue->status='pending';
+//			$queue->save();
+//
+//			$queue_dt=clone $start_dt;
+//
+//			if ($this->repeatType=='none')
+//				return;
+//			switch ($this->repeatType)
+//			{
+//				case 'daily':
+//
+//			}
+//
+//			while (true)
+//			{
+//				
+//			}
+//
+//			switch($this->repeatType)
+//			{
+//				case 'daily':
+//					while (true)
+//					{
+//						$queue_dt->addDay($this->repeatEvery);
+//						if ($queue_dt->get() > $until_dt->get())
+//							break;
+//						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
+//								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
+//						{
+//							$queue=MessageQueue::factoryByCompany($this->company);
+//							$queue->message_id=$this->id;
+//							$queue->schedule_on=$queue_dt->get();
+//							$queue->status='pending';
+//							$queue->save();
+//						}
+//					}
+//					break;
+//				case 'weekly':
+//					while (true)
+//					{
+//						$queue_dt->addWeek($this->repeatEvery);
+//						if ($queue_dt->get() > $until_dt->get())
+//							break;
+//						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
+//								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
+//						{
+//							$queue=MessageQueue::factoryByCompany($this->company);
+//							$queue->message_id=$this->id;
+//							$queue->schedule_on=$queue_dt->get();
+//							$queue->status='pending';
+//							$queue->save();
+//						}
+//					}
+//					break;
+//				case 'monthly':
+//					while (true)
+//					{
+//						$queue_dt->addMonth($this->repeatEvery);
+//						if ($queue_dt->get() > $until_dt->get())
+//							break;
+//						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
+//								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
+//						{
+//							$queue=MessageQueue::factoryByCompany($this->company);
+//							$queue->message_id=$this->id;
+//							$queue->schedule_on=$queue_dt->get();
+//							$queue->status='pending';
+//							$queue->save();
+//						}
+//					}
+//					break;
+//				case 'yearly':
+//					while (true)
+//					{
+//						$queue_dt->addYear($this->repeatEvery);
+//						if ($queue_dt->get() > $until_dt->get())
+//							break;
+//						if (!$queueModel->exists('message_id=:msg_id and schedule_on=:date',
+//								array(':msg_id'=>$this->id,':date'=>$full_date->date)))
+//						{
+//							$queue=MessageQueue::factoryByCompany($this->company);
+//							$queue->message_id=$this->id;
+//							$queue->schedule_on=$queue_dt->get();
+//							$queue->status='pending';
+//							$queue->save();
+//						}
+//					}
+//					break;
+//				default: // No repeating
+//			}
+//		}
+//	}
 
 	public function rebuildGroup()
 	{

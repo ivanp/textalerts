@@ -37,6 +37,6 @@ class CompanyMailer extends CComponent
 			->setBody($body)
 			;
 
-		$instance->send($message);
+		return $instance->send($message);
 	}
 }

@@ -5,6 +5,7 @@ class MessageSchedule extends CompanyActiveRecord
 	const TypeOnce='once';
 	const TypeRepeat='repeat';
 
+	const RepeatNone='none';
 	const RepeatDaily='daily';
 	const RepeatWeekly='weekly';
 	const RepeatMonthly='monthly';
@@ -86,7 +87,27 @@ ENGINE = MyISAM";
 		else
 			return false;
 	}
-
+	
+	/**
+	 * Get repeat_until - Zend_Date version
+	 * 
+	 * @return Zend_Date
+	 */
+	public function getRepeatUntil()
+	{
+		if ($this->repeat_until!==null)
+			$until_dt=new Zend_Date($this->repeat_until, Zend_Date::TIMESTAMP);
+		else
+		{
+			$until_dt=Zend_Date::now();
+			$until_dt->addYear(10); // 10 yrs for now
+		}
+		$until_dt->setHour(23);
+		$until_dt->setMinute(59);
+		$until_dt->setSecond(59);
+		return $until_dt;
+	}
+	
 	protected function afterSave()
 	{
 		parent::afterSave();
@@ -124,20 +145,8 @@ ENGINE = MyISAM";
 					if ($this->repeat_type!=='none')
 					{
 						// Create schedule queues
-						$start_dt=new Zend_Date($this->start, Zend_Date::TIMESTAMP);
-
-						if ($this->repeat_until!==null)
-							$until_dt=new Zend_Date($this->repeat_until, Zend_Date::TIMESTAMP);
-						else
-						{
-							$until_dt=Zend_Date::now();
-							$until_dt->addYear(10); // 10 yrs for now
-						}
-						$until_dt->setHour(23);
-						$until_dt->setMinute(59);
-						$until_dt->setSecond(59);
-
 						$queue_dt=new Zend_Date($this->start, Zend_Date::TIMESTAMP);
+						$until_dt=$this->getRepeatUntil();
 						switch ($this->repeat_type)
 						{
 							case 'daily':

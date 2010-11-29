@@ -66,7 +66,7 @@
 </fieldset>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Create Event'); ?>
+		<?php echo CHtml::submitButton('Save'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

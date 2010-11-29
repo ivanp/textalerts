@@ -3,19 +3,19 @@ $cs = Yii::app()->clientScript;
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/datepicker.js'), CClientScript::POS_HEAD);
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/jquery-ui-timepicker-addon.min.js'), CClientScript::POS_HEAD);
 
-$this->pageTitle=Yii::app()->name . ' - Create New Message';
+$this->pageTitle=Yii::app()->name . ' - Edit Message';
 $this->breadcrumbs=array(
 	'Messages' => array('message/index'),
-	'Create New'
+	'Edit Message'
 );
 
 ?>
-<h1>Send New Message</h1>
+<h1>Edit Message</h1>
 
-<?php if(Yii::app()->user->hasFlash('message-create')): ?>
+<?php if(Yii::app()->user->hasFlash('message-edit')): ?>
 
 <div class="flash-success">
-	<?php echo Yii::app()->user->getFlash('message-create'); ?>
+	<?php echo Yii::app()->user->getFlash('message-edit'); ?>
 </div>
 
 <?php endif; ?>

@@ -106,6 +106,7 @@ ENGINE = MyISAM";
 			array('repeat_type','in','range'=>array_keys($this->getRepeatTypes())),
 			array('repeat_every','numerical','integerOnly'=>true,'min'=>1,'max'=>30,'allowEmpty'=>true),
 			array('repeat_until','validDateTime','allowEmpty'=>true),
+			array('description','safe'),
 			array('start,end,repeat_until','filter','filter'=>array($this,'dateTimeToTimeStamp'),'on'=>'create,edit'),
 			array('start_time,end_time','safe','on'=>'create,edit')
 		);

@@ -78,6 +78,53 @@ class MessageController extends CCompanyController
 			'group_id' => $group_id
 		));
 	}
+	
+	public function actionEdit($id)
+	{
+		$message=Message::modelByCompany($this->company)->findByPk($id);
+		if (!($message instanceof Message))
+			throw new CHttpException(404, 'Message not found');
+		$message->setScenario('edit');
+		$varname = get_class($message);
+
+		if (isset($_POST[$varname]))
+		{
+			$message->attributes=$_POST[$varname];
+			if (isset($_POST['cmd_start']))
+				$message->status='pending';
+			else
+				$message->status='draft';
+
+			if ($message->save()) 
+			{
+				Yii::app()->user->setFlash('flash-success', 'Message has been created');
+				$this->redirect($this->createUrl('/message/index'), true);
+			}
+		}
+
+		$crit=Group::modelByCompany($this->company)->getDbCriteria();
+		$crit->order='title';
+		$groups = Group::modelByCompany($this->company)->findAll($crit);
+		$group_select = array();
+		foreach ($groups as $group)
+			$group_select[$group->id] = $group->title;
+		$group_id = Yii::app()->getRequest()->getParam('group_id');
+		$this->render('edit', array(
+			'message'	=> $message,
+			'groups' => $group_select,
+			'group_id' => $group_id
+		));
+	}
+	
+	public function actionDelete($id)
+	{
+		$message=Message::modelByCompany($this->company)->findByPk($id);
+		if (!($message instanceof Message))
+			throw new CHttpException(404, 'Message not found');
+		$message->delete();
+		Yii::app()->user->setFlash('message', 'Message has been deleted');
+		$this->redirect($this->createUrl('/message/index'), true);
+	}
 
 	public function actionIndex($status = 'all')
 	{

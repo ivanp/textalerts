@@ -42,6 +42,11 @@ ENGINE = MyISAM";
 		$schedule=$this->schedule;
 		$company=$this->company;
 		$company_info=$company->info;
+		$now=time();
+		
+		// If it's scheduled message but the schedule is in the past, skip it!
+		if (($message->type==Message::SendTypeSchedule) && ($this->schedule_on < $now))
+			return;
 
 		$user_pool=array();
 		// Main group loop
@@ -57,6 +62,7 @@ ENGINE = MyISAM";
 				{
 					$queue=new QueueMail();
 					$queue->company_id=$this->company->id;
+					$queue->mq_id=$this->id;
 					$queue->to=$user->email;
 					$queue->subject=$company_info->title;
 					$queue->from=$company_info->email_from;
@@ -78,6 +84,7 @@ ENGINE = MyISAM";
 //					$queue->save();
 					$queue=new QueueMail();
 					$queue->company_id=$this->company->id;
+					$queue->mq_id=$this->id;
 					$queue->to=$user->phone->getSmsMailGateway();
 					$queue->subject=$company_info->title;
 					$queue->from=$company_info->email_from;
@@ -88,6 +95,13 @@ ENGINE = MyISAM";
 				}
 			}
 		}
+	}
+	
+	protected function afterDelete() 
+	{
+		parent::afterDelete();
+		QueueMail::model()->deleteAllByAttributes(array('mq_id'=>$this->id,'status'=>'created'));
+		QueueText::model()->deleteAllByAttributes(array('mq_id'=>$this->id,'status'=>'created'));
 	}
 
 	public function relations()

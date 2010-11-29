@@ -52,12 +52,20 @@ class MainApplication extends CWebApplication {
 
 	public function createFrontUrl($route,$params=array(),$ampersand='&')
 	{
-		return 'http://'.$this->params['domain'].$this->createUrl($route, $params, $ampersand);
+		if($secure=Yii::app()->getRequest()->getIsSecureConnection())
+			$http='https';
+		else
+			$http='http';
+		return $http.'://'.$this->params['domain'].$this->createUrl($route, $params, $ampersand);
 	}
 
 	public function createCompanyUrl(Company $company,$route,$params=array(),$ampersand='&')
 	{
-		return 'http://'.$company->host.'.'.$this->params['domain'].$this->createUrl($route, $params, $ampersand);
+		if($secure=Yii::app()->getRequest()->getIsSecureConnection())
+			$http='https';
+		else
+			$http='http';
+		return $http.'://'.$company->host.'.'.$this->params['domain'].$this->createUrl($route, $params, $ampersand);
 	}
 
 	public function getCompany()

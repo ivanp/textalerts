@@ -8,7 +8,7 @@ $this->breadcrumbs=array(
 $cs=Yii::app()->getClientScript();
 $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/jquery-ui-timepicker-addon.min.js'), CClientScript::POS_HEAD);
 ?>
-<h1>Create New Event</h1>
+<h1>Edit Event</h1>
 
 <?php if(Yii::app()->user->hasFlash('event-edit')): ?>
 <div class="flash-success">

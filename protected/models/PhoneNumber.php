@@ -169,7 +169,7 @@ ENGINE = MyISAM";
 		if (!$this->user->havePhoneNumber() || $this->user->isPhoneConfirmed())
 			return;
 		
-		$body = sprintf('phoneduck.com confirmation code: '.$this->code);
+		$body = sprintf(HOSTNAME.' confirmation code: '.$this->code);
 		$to_mail = $this->getSmsMailGateway();
 		CompanyMailer::sendMessage($this->company->owner->email, $to_mail, $body, 'Confirmation Code');
 	}
