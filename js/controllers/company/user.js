@@ -27,18 +27,24 @@ App.modules.company.user = {
 					group_id: group_id
 				},
 				success: function(response) {
-					var row=$(response);
-					// Initialize AJAX checkbox
-					App.widgets.SubscriptionCheckbox.init_cb({container: row,
-								user_id: response.user_id, group_id: response.group_id});
-					var cols=row.find("td").wrapInner('<div style="display:none"/>');
-					table.find("tr:last").after(row);
-					cols.parent().find("td > div").slideDown("700", function() {
-						var div=$(this);
-						div.replaceWith(div.contents());
-					});
-					select.attr('disabled','');
-					select.val('');
+					response=jQuery.parseJSON(response);
+					var row=$(response.row);
+					if (response.status=="success") {
+						// Initialize AJAX checkbox
+						App.widgets.SubscriptionCheckbox.init_cb({container: row,
+									user_id: response.user_id, group_id: response.group_id});
+						var cols=row.find("td").wrapInner('<div style="display:none"/>');
+						table.find("tr:last").after(row);
+						cols.parent().find("td > div").slideDown("700", function() {
+							var div=$(this);
+							div.replaceWith(div.contents());
+						});
+						select.attr('disabled','');
+						select.val('');
+					} else {
+						alert(response.message);
+					}
+
 				},
 				error: function() {
 					alert("Something's not right, reloading");

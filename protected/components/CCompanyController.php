@@ -51,11 +51,11 @@ class CCompanyController extends Controller
 				array('label'=>'Settings', 'url'=>array('company/settings'), 'visible'=>$isAdmin),
 				array('label'=>'Login', 'url'=>array('user/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Register', 'url'=>array('user/register'), 'visible'=>Yii::app()->user->isGuest),
-				array('label'=>'Account ('.Yii::app()->user->name.')', 'url'=>array('/user/account'), 'visible'=>!Yii::app()->user->isGuest, 'items' => array(
+				array('label'=>'Account ('.Yii::app()->user->name.')',  'url'=>array('#'), 'visible'=>!Yii::app()->user->isGuest, 'items' => array(
 						array('label' => 'Profile', 'url'=>array('user/profile')),
 						array('label' => 'Subscriptions', 'url'=>array('user/subscription')),
 						array('label' => 'Logout', 'url'=>array('user/logout'))
-				)),
+				), 'linkOptions' => array('onclick'=>'return false')),
 			);
 		
 	}

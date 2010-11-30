@@ -4,6 +4,8 @@ $this->breadcrumbs=array(
 	'Subscriptions',
 );
 
+$this->widget('application.components.widgets.GroupSubscriptionCheckboxes', array('init'=>true));
+
 ?>
 <h1>Subscriptions</h1>
 

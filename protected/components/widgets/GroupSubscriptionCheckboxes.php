@@ -13,6 +13,8 @@ class GroupSubscriptionCheckboxes extends CWidget
 	 * @var Group
 	 */
 	public $group;
+
+	public $init = false;
 	
 	public $class='';
 
@@ -34,11 +36,22 @@ class GroupSubscriptionCheckboxes extends CWidget
 
 		$this->class=trim($this->class.' groupsubcb');
 
-		
+		if (!self::$loaded)
+		{
+			$cs = Yii::app()->getClientScript();
+			$cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/widgets/scb.js'), CClientScript::POS_HEAD);
+			$script='App.widgets.SubscriptionCheckbox.init('.json_encode(
+				array('url'=>Yii::app()->createUrl('group/subscription'))).');';
+			$cs->registerScript('initcblib', $script, CClientScript::POS_READY);
+			self::$loaded=true;
+		}
 	}
 
 	public function run()
 	{
+		if ($this->init)
+			return;
+		
 	 	$id = sprintf('gscb_%d_%d',$this->group->id,$this->user->id);
 	 	echo CHtml::openTag('span', array('id'=>$id, 'class'=>$this->class));
 		// Mail
@@ -52,19 +65,10 @@ class GroupSubscriptionCheckboxes extends CWidget
 
 		echo CHtml::closeTag('span');
 
-//		$subUrl=Yii::app()->createCompanyUrl($this->group->company, 'group/subscribe', array('group_id'=>$this->group->id,'user_id'=>$this->user->id));
-//		$unsubUrl=Yii::app()->createCompanyUrl($this->group->company, 'group/unsubscribe', array('group_id'=>$this->group->id,'user_id'=>$this->user->id));
+		$subUrl=Yii::app()->createCompanyUrl($this->group->company, 'group/subscribe', array('group_id'=>$this->group->id,'user_id'=>$this->user->id));
+		$unsubUrl=Yii::app()->createCompanyUrl($this->group->company, 'group/unsubscribe', array('group_id'=>$this->group->id,'user_id'=>$this->user->id));
 
 		$cs = Yii::app()->getClientScript();
-		$cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('webroot').'/js/widgets/scb.js'), CClientScript::POS_HEAD);
-
-		if (!self::$loaded)
-		{
-			$script='App.widgets.SubscriptionCheckbox.init('.json_encode(
-				array('url'=>Yii::app()->createCompanyUrl($this->group->company,'group/subscription'))).');';
-			$cs->registerScript('initcblib', $script, CClientScript::POS_READY);
-			self::$loaded=true;
-		}
 		$script = "App.widgets.SubscriptionCheckbox.init_cb(".json_encode(array('container'=>'#'.$id,'group_id'=>$this->group->id,'user_id'=>$this->user->id)).");";
 		$cs->registerScript($id, $script, CClientScript::POS_READY);
 	}

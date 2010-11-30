@@ -16,7 +16,7 @@ class UserController extends CCompanyController
 	{
 		return array(
 				array('allow',
-						'actions'=>array('profile'),
+						'actions'=>array('profile','subscription'),
 						'users'=>array('@')
 				),
 				array('deny',
@@ -353,9 +353,17 @@ class UserController extends CCompanyController
 
 			if ($request->getIsAjaxRequest())
 			{
-				$this->renderPartial('_subscription_row',array(
-					'user'=>$user,
-					'group'=>$group
+//				$this->renderPartial('_subscription_row',array(
+//					'user'=>$user,
+//					'group'=>$group
+//				));
+				echo CJSON::encode(array(
+					'status'=>'success',
+					'row'=>$this->renderPartial('_subscription_row', array(
+							'group'=>$group,
+							'user'=>$user), true),
+					'user_id'=>$user->id,
+					'group_id'=>$group->id
 				));
 				Yii::app()->end();
 			}

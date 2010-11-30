@@ -1,5 +1,6 @@
 <?php
-//var_dump($this->uniqueid, $this->action->id);
+$this->widget('application.components.widgets.GroupSubscriptionCheckboxes', array('init'=>true));
+
 $user=User::getLoggedUser();
 $is_sender=$this->company->isSender($user);
 $is_admin=$this->company->isAdministrator($user);
