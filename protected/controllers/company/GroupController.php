@@ -28,6 +28,7 @@ class GroupController extends CCompanyController
 		$pages=new CPagination($total_groups);
 		$pages->pageSize=10;
     $pages->applyLimit($criteria);
+		$criteria->order='name';
 		$groups=Group::modelByCompany($this->company)->findAll($criteria);
 
 		$this->render('index', array(
