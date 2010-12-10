@@ -45,3 +45,11 @@ $this->breadcrumbs=array(
 	</tbody>
 
 </table>
+
+<?php if ($pages->pageCount > 1): ?>
+<div class="pagelinks">
+<?$this->widget('CLinkPager', array(
+    'pages' => $pages,
+))?>
+</div>
+<?php endif; ?>

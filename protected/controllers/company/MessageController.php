@@ -128,10 +128,22 @@ class MessageController extends CCompanyController
 
 	public function actionIndex($status = 'all')
 	{
-		$messages = Message::modelByCompany($this->company)->findAll();
+//		$messages = Message::modelByCompany($this->company)->findAll();
+//
+//		$this->render('index', array(
+//			'messages' => $messages
+//		));
+		
+		$criteria=new CDbCriteria();
+		$total_msgs=Message::modelByCompany($this->company)->count($criteria);
+		$pages=new CPagination($total_msgs);
+		$pages->pageSize=10;
+    $pages->applyLimit($criteria);
+		$messages=Message::modelByCompany($this->company)->findAll($criteria);
 
 		$this->render('index', array(
-			'messages' => $messages
+			'messages'=>$messages,
+			'pages'=>$pages
 		));
 	}
 }

@@ -4,7 +4,10 @@ $this->breadcrumbs=array(
 	'About',
 );
 ?>
-<h1>About</h1>
+<h1>About MychruchAlerts.com</h1>
 
-<p>This is a "static" page. You may change the content of this page
-by updating the file <tt><?php echo __FILE__; ?></tt>.</p>
+<p>My Church Alerts<br/>
+120 E. First Street<br/>
+Auburn, In 46706 <br/>
+info@mychurchalerts.com
+</p>

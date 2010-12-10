@@ -49,6 +49,8 @@ ENGINE = MyISAM";
 			return;
 
 		$user_pool=array();
+		$total_text=0;
+		$total_mail=0;
 		// Main group loop
 		foreach ($message->recipients as $group)
 		{
@@ -70,6 +72,7 @@ ENGINE = MyISAM";
 					$queue->schedule_on=$this->schedule_on;
 					$queue->status='created';
 					$queue->save();
+					$total_mail++;
 				}
 				if ($subscriber->text && $user->isPhoneConfirmed())
 				{
@@ -92,9 +95,15 @@ ENGINE = MyISAM";
 					$queue->schedule_on=$this->schedule_on;
 					$queue->status='created';
 					$queue->save();
+					$total_text++;
 				}
-			}
-		}
+			}//foreach ($group->subscribers as $subscriber)
+		}//foreach ($message->recipients as $group)
+		$count=MessageQueueCount::factoryByCompany($this->company);
+		$count->message_queue_id=$this->id;
+		$count->total_text=$total_text;
+		$count->total_mail=$total_mail;
+		$count->save();
 	}
 	
 	protected function afterDelete() 
@@ -108,7 +117,8 @@ ENGINE = MyISAM";
 	{
 		return array(
 			'message'=>array(self::BELONGS_TO,$this->getCompanyClass('Message'),'message_id'),
-			'schedule'=>array(self::BELONGS_TO,$this->getCompanyClass('MessageSchedule'),'message_id')
+			'schedule'=>array(self::BELONGS_TO,$this->getCompanyClass('MessageSchedule'),'message_id'),
+			'message_count'=>array(self::HAS_ONE,$this->getCompanyClass('MessageQueueCount'),'message_queue_id')
 		);
 	}
 }

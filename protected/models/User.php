@@ -234,7 +234,7 @@ ENGINE = MyISAM";
 
 	public function createViewUrl()
 	{
-		return Yii::app()->createFrontUrl('user/view', array('id'=>$this->id));
+		return Yii::app()->createCompanyUrl($this->company, 'user/view', array('id'=>$this->id));
 	}
 
 	public function generateCode()

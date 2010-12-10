@@ -64,5 +64,5 @@ $roles = array('Member', 'Administrator', 'Sender', 'Non-member');
 <?$this->widget('CLinkPager', array(
     'pages' => $pages,
 ))?>
-<?php endif; ?>
 </div>
+<?php endif; ?>

@@ -57,103 +57,6 @@ class SiteController extends CCompanyController
 	    }
 	}
 
-	public function actionDashboard()
-	{
-		$this->layout='//layouts/column2';
-		$user = User::getLoggedUser();
-		$this->render('dashboard', array(
-			'user' => $user,
-			'mail_alerts'	=> array(),
-			'text_alerts' => array(),
-			'avail_mail_alerts' => array(),
-			'avail_text_alerts' => array()
-//			'mail_alerts'	=> $user->mail_alerts,
-//			'text_alerts' => $user->text_alerts,
-//			'avail_mail_alerts' => Group::getAvailableMessageGroups(),
-//			'avail_text_alerts' => Group::getAvailableTextGroups()
-		));
-	}
-
-	public function actionSubscribe($type, $group_id)
-	{
-		switch ($type) {
-			case 'mail':
-				$table = 'message_groups_subscribers';
-				break;
-			case 'text':
-				$table = 'text_group_subscribers';
-				break;
-			default:
-				throw new CHttpException(400, 'Incorrect type given.');
-		}
-		$group = Group::model()->findByPk($group_id);
-		if ($group===null) {
-			throw new CHttpException(404, 'Group #'.$group_id.' does not exist in database.');
-		}
-
-		$user = User::getLoggedUser();
-		$user_id = $user->subscriber_id;
-		$conn = Yii::app()->db;
-		$cmd = $conn->createCommand('select * from '.$table.' where message_group_id = :group_id and subscriber_id = :user_id');
-		$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
-		$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-		$row = $cmd->queryRow();
-		
-		if (!$row) {
-			$cmd = $conn->createCommand('insert into '.$table.' (message_group_id, subscriber_id) values (:group_id, :user_id)');
-			$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
-			$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-			$cmd->execute();
-
-			$group = Group::model()->findByPk($group_id);
-			echo $this->renderPartial('_group_row',array(
-					'group'=>$group,
-					'type' =>$type
-				), true);
-			echo $this->renderPartial('_add_group',array(
-					'group'=>$group,
-					'type' =>$type
-				), true);
-			Yii::app()->end();
-		}
-	}
-
-	public function actionUnsubscribe($type, $group_id) {
-		switch ($type) {
-			case 'mail':
-				$table = 'message_groups_subscribers';
-				break;
-			case 'text':
-				$table = 'text_group_subscribers';
-				break;
-			default:
-				throw new CHttpException(400, 'Incorrect type given.');
-		}
-
-		$user = User::getLoggedUser();
-		$user_id = $user->subscriber_id;
-		$conn = Yii::app()->db;
-
-		$cmd = $conn->createCommand('select * from '.$table.' where message_group_id = :group_id and subscriber_id = :user_id');
-		$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
-		$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-		$row = $cmd->queryRow();
-
-		if ($row) {
-			$cmd = $conn->createCommand('delete from '.$table.' where message_group_id = :group_id and subscriber_id = :user_id');
-			$cmd->bindParam(':group_id', $group_id, PDO::PARAM_INT);
-			$cmd->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-			$rows = $cmd->execute();
-
-			$group = Group::model()->findByPk($group_id);
-			echo $this->renderPartial('_add_group',array(
-					'group'=>$group,
-					'type' =>$type
-				), true);
-			Yii::app()->end();
-		}
-	}
-
 	public function filters()
 	{
 		return array(
@@ -177,27 +80,12 @@ class SiteController extends CCompanyController
 
 	public function actionTest()
 	{
-//		$msg=Message::modelByCompany($this->company)->findByAttributes(array('id'=>3));
-//		var_dump(get_class($msg), get_class($msg->schedule));
-//
-//		$date=new Zend_Date();
-//		//$date->setTimezone('PST');
-//		$date->addYear(100);
-//		print $date."<br/>";
-//		$num=$date->get();
-//		$int=(float)$num;
-//		var_dump($num,$int);
-		//$date->setTime()
+		date_default_timezone_set('America/Indiana/Indianapolis');
+		$dt = Zend_Date::now();
+
+//$dt->setTimezone('America/Indiana/Indianapolis');
+
+echo $dt;
 		
-//		print $date;
-//		$dt = new Zend_Date(strtotime('09:59 pm'), Zend_Date::TIMESTAMP);
-//		$now=Zend_Date::now();
-//		$now->setMinute($dt);
-		//$t=$dt->getHour()+1;
-		//var_dump($t);
-//var_dump(date('Y-m-d H:i:s', 1290704400));
-		//var_dump(date('Y-m-d H:i:s', strtotime('09:59 am')));
-		
-		var_dump(Yii::app()->getRequest()->getHostInfo());
 	}
 }

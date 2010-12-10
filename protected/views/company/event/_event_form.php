@@ -28,7 +28,7 @@
 		<?php echo $form->error($event,'time_type'); ?>
 	</div>
 
-	<div class="row">
+	<div class="row dt_fields_start">
 		<?php echo $form->labelEx($event,'start'); ?>
 		<span class="oneliner">
 			<?php echo $form->dateField($event,'start'); ?>
@@ -37,7 +37,7 @@
 		<?php echo $form->error($event,'start'); ?>
 	</div>
 
-	<div class="row">
+	<div class="row dt_fields_end">
 		<?php echo $form->labelEx($event,'end'); ?>
 		<span class="oneliner">
 			<?php echo $form->dateField($event,'end'); ?>
@@ -52,7 +52,7 @@
 		<?php echo $form->error($event,'repeat_type'); ?>
 	</div>
 
-	<div class="row repeat_fields">
+	<div class="row repeat_fields repeat_every_label">
 		<?php echo $form->labelEx($event,'repeat_every'); ?>
 		<?php echo $form->dropDownList($event,'repeat_every',$event->getRepeatEveryDays()); ?>
 		<?php echo $form->error($event,'repeat_every'); ?>

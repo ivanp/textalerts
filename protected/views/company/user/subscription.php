@@ -37,7 +37,7 @@ $this->widget('application.components.widgets.GroupSubscriptionCheckboxes', arra
 <div class="form">
 <div id="selectgroup" style="margin-top: 16px">
 	<select name="group_id">
-		<option>Select group to subscribe:</option>
+		<option value="">Select group to subscribe:</option>
 		<?php foreach ($available_groups as $group): ?>
 		<option value="<?php echo $group->id?>"><?php echo CHtml::encode($group->title)?></option>
 		<?php endforeach; ?>

@@ -39,10 +39,12 @@ App.modules.company.user = {
 							var div=$(this);
 							div.replaceWith(div.contents());
 						});
-						select.attr('disabled','');
+						select.removeAttr('disabled');
 						select.val('');
 					} else {
 						alert(response.message);
+						select.removeAttr('disabled');
+						select.val('');
 					}
 
 				},

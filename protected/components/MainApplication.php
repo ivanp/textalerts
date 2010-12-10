@@ -44,10 +44,11 @@ class MainApplication extends CWebApplication {
 //		$command = $this->db->createCommand('SET AUTOCOMMIT=0');
 //		$command->execute();
 
-
 		Yii::import("ext.yiiext.components.zendAutoloader.EZendAutoloader", true);
 		EZendAutoloader::$prefixes = array('Zend', 'Custom');
 		Yii::registerAutoloader(array("EZendAutoloader", "loadClass"));
+		
+		date_default_timezone_set($this->params['timezone']);
 	}
 
 	public function createFrontUrl($route,$params=array(),$ampersand='&')

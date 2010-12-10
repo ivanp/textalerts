@@ -55,6 +55,11 @@ return CMap::mergeArray(
 					'class'=>'CFileLogRoute',
 					'levels'=>'error, warning',
 				),
+				array(
+					'class'=>'CEmailLogRoute',
+					'levels'=>'error, warning',
+					'emails'=>'ivan@primaguna.com',
+				),
 				// uncomment the following to show log messages on web pages
 //				array(
 //					'class'=>'CWebLogRoute',
@@ -64,6 +69,9 @@ return CMap::mergeArray(
 //		'swiftMailer' => array(
 //			'class' => 'ext.swiftMailer.SwiftMailer',
 //		),
+		'assetManager'=>array(
+			'class'=>'application.components.CompanyAssetManager'
+		)
 	),
 
 	// application-level parameters that can be accessed
@@ -75,6 +83,8 @@ return CMap::mergeArray(
 		'redirectHosts'=>array('www','web','admin','root','system','adm','w','ww',
 				'ftp','mail','irc','gopher','smtp','pop3','pop','imap','system','w3',
 				'administrator'),
+		'version'=>'201012012213',
+		'timezone'=>'America/Indiana/Indianapolis'
 	),
 
 	'behaviors'=>array(

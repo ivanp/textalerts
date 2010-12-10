@@ -45,6 +45,26 @@ class QueueText extends CActiveRecord
 		else
 			return false;
 	}
+	
+	protected function afterSave()
+	{
+		parent::afterSave();
+		
+		if ($this->getScenario()=='update')
+		{
+			$count=$this->getMessageQueue()->message_count;
+			switch ($this->status)
+			{
+				case 'sent':
+					$count->sent_text++;
+					break;
+				case 'failed':
+					$count->failed_text++;
+					break;
+			}
+			$count->save();
+		}
+	}
 
 	public function hash($str)
 	{

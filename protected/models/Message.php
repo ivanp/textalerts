@@ -17,9 +17,6 @@ class Message extends CompanyActiveRecord
 	 */
 	public $groups=array();
 
-//	public $startDate;
-//	public $startTime;
-//	public $startDateTime; // string - only for forms
 	public $start; // unixtime
 
 	public $repeatType;

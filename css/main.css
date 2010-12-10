@@ -49,7 +49,7 @@ body
 
 #mainmenu
 {
-	background:white url(bg.gif) repeat-x left top;
+	background:white url(/images/bg.gif) repeat-x left top;
 	width: 100%;
 	clear: both;
 	display:block;

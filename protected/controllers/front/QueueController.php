@@ -32,14 +32,17 @@ class QueueController extends CFrontController
 			$from_mail=$company->info->email_from;
 			$from_name=$company->name;
 
-			CompanyMailer::sendMessage(
+			$status = CompanyMailer::sendMessage(
 				array($from_mail=>$from_name),
 				$queue->to,
 				$queue->body,
 				$queue->subject
 			);
 
-			$queue->status='sent';
+			if ($status)
+				$queue->status='sent';
+			else
+				$queue->status='failed';
 			$queue->save();
 		}
 //		$queues=QueueMail::model()->with('company')->findAll('status = :status and schedule_on <= :schedule',
@@ -51,5 +54,9 @@ class QueueController extends CFrontController
 //		}
 	}
 
+	public function actionCheckstatus()
+	{
+		
+	}
 	
 }

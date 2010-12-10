@@ -24,6 +24,21 @@ class UserController extends CCompanyController
 					'users'=>array('?')),
 		);
 	}
+	
+	public function actionIndex()
+	{
+		$criteria=new CDbCriteria();
+		$total_users=User::modelByCompany($this->company)->count($criteria);
+		$pages=new CPagination($total_users);
+		$pages->pageSize=20;
+    $pages->applyLimit($criteria);
+		$users=User::modelByCompany($this->company)->findAll($criteria);
+
+		$this->render('index', array(
+			'users'=>$users,
+			'pages'=>$pages
+		));
+	}
 
 	public function actionView($id)
 	{
@@ -331,10 +346,8 @@ class UserController extends CCompanyController
 				// Editing other user's profile
 				if ($user->id!=$id)
 				{
-					// Administrator cannot edit owner's profile
 					if ($id==$owner->id)
 						throw new CHttpException(401, 'Access Denied');
-					$set_privilege=true;
 				}
 			}
 			$user = User::modelByCompany($this->company)->findByPk($id);
@@ -349,28 +362,42 @@ class UserController extends CCompanyController
 							->findByPk($request->getPost('group_id'));
 			if (!($group instanceof Group))
 				throw new CHttpException(404);
-			$group->subscribeUser($user, 'mail');
-
-			if ($request->getIsAjaxRequest())
+			
+			if ($group->isUserSubscribed($user))
 			{
-//				$this->renderPartial('_subscription_row',array(
-//					'user'=>$user,
-//					'group'=>$group
-//				));
-				echo CJSON::encode(array(
-					'status'=>'success',
-					'row'=>$this->renderPartial('_subscription_row', array(
-							'group'=>$group,
-							'user'=>$user), true),
-					'user_id'=>$user->id,
-					'group_id'=>$group->id
-				));
-				Yii::app()->end();
+				if ($request->getIsAjaxRequest())
+				{
+					echo CJSON::encode(array(
+						'status'=>'error',
+						'message'=>'User already subscribed'
+					));
+					Yii::app()->end();
+				}
+				else
+					Yii::app()->user->setFlash('user-subscription',
+									sprintf('Email %s has already subscribed to group "%s"',
+													$user->email,$group->title));
 			}
 			else
-				Yii::app()->user->setFlash('user-subscription',
-								sprintf('Email %s has been added to group "%s"',
-												$user->email,$group->title));
+			{
+				$group->subscribeUser($user, 'mail');
+				if ($request->getIsAjaxRequest())
+				{
+					echo CJSON::encode(array(
+						'status'=>'success',
+						'row'=>$this->renderPartial('_subscription_row', array(
+								'group'=>$group,
+								'user'=>$user), true),
+						'user_id'=>$user->id,
+						'group_id'=>$group->id
+					));
+					Yii::app()->end();
+				}
+				else
+					Yii::app()->user->setFlash('user-subscription',
+									sprintf('Email %s has been added to group "%s"',
+													$user->email,$group->title));
+			}
 		}
 
 		$available_groups=array();

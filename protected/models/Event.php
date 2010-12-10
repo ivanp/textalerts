@@ -1,9 +1,8 @@
 <?php
 
-
 class Event extends CompanyActiveRecord
 {
-	const MaxOccurrences=370; // why? it's magic numberr :p don't ask
+	const MaxOccurrences=370; // why? it's magic number :p don't ask
 	// Fields that only appear at forms
 //	public $start;
 //	public $end;

@@ -40,6 +40,26 @@ class QueueMail extends CActiveRecord
 		else
 			return false;
 	}
+	
+	protected function afterSave()
+	{
+		parent::afterSave();
+		
+		if ($this->getScenario()=='update')
+		{
+			$count=$this->getMessageQueue()->message_count;
+			switch ($this->status)
+			{
+				case 'sent':
+					$count->sent_mail++;
+					break;
+				case 'failed':
+					$count->failed_mail++;
+					break;
+			}
+			$count->save();
+		}
+	}
 
 	public function hash($str)
 	{
@@ -51,5 +71,14 @@ class QueueMail extends CActiveRecord
 		return array(
 			'company'=>array(self::BELONGS_TO,'Company','company_id')
 		);
+	}
+	
+	/**
+	 *
+	 * @return MessageQueue
+	 */
+	public function getMessageQueue()
+	{
+		return MessageQueue::modelByCompany($this->company)->findByPk($this->mq_id);
 	}
 }

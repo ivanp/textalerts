@@ -169,27 +169,6 @@ class Company extends CActiveRecord
 	}
 
 
-//	public function __get($name)
-//	{
-//		if ($name=='groups')
-//			return Group::modelByCompany($this)->findAll();
-//		else
-//			return parent::__get($name);
-//	}
-//
-//	public function __call($name,$parameters)
-//	{
-//		if ($name=='groups')
-//		{
-//			$condition = isset($parameters[0]['condition'])
-//				? $parameters[0]['condition']
-//				: '';
-//			return Group::modelByCompany($this)->findAll($condition, $parameters[0]);
-//		}
-//		else
-//			return parent::__call($name, $parameters);
-//	}
-
 	public function getUploadDir()
 	{
 		$dir=Yii::getPathOfAlias(Yii::app()->params['uploadDir']).'/'.$this->id;
