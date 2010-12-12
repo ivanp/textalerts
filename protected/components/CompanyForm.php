@@ -3,7 +3,7 @@
 class CompanyForm extends CActiveForm
 {
 	const DateFormat='mm/dd/yy'; //'yy-mm-dd';
-	const TimeFormat='hh:00 tt';
+	const TimeFormat='hh:mm tt';
 	
 	public function dateField($model,$attribute,$htmlOptions=array())
 	{
@@ -25,7 +25,8 @@ class CompanyForm extends CActiveForm
 //		var_dump($model->$attribute);
 		$id=isset($htmlOptions['id']) ? $htmlOptions['id']
 			: CHtml::getIdByName(CHtml::resolveName($model,$attribute));
-		$params=array('timeFormat'=>self::TimeFormat,'showMinute'=>false,'ampm'=>true);
+		$params=array('timeFormat'=>self::TimeFormat,'showMinute'=>true,
+				'ampm'=>true,'stepMinute'=>15);
 		$script='$("#'.$id.'").timepicker('.CJSON::encode($params).');';
 		$cs=Yii::app()->getClientScript();
 		$cs->registerScript($id,$script,CClientScript::POS_READY);
@@ -42,7 +43,7 @@ class CompanyForm extends CActiveForm
 		$id=isset($htmlOptions['id']) ? $htmlOptions['id']
 			: CHtml::getIdByName(CHtml::resolveName($model,$attribute));
 		$params=array('dateFormat'=>self::DateFormat,'timeFormat'=>self::TimeFormat,
-			'showMinute'=>false,'ampm'=>true);
+			'showMinute'=>true,'ampm'=>true,'stepMinute'=>15);
 		$script='$("#'.$id.'").datetimepicker('.CJSON::encode($params).');';
 		$cs=Yii::app()->getClientScript();
 		$cs->registerScript($id,$script,CClientScript::POS_READY);

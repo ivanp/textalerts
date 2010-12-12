@@ -25,8 +25,9 @@ App.modules.company.event = {
 			"monthly": "Repeat every how many months?",
 			"yearly": "Repeat every how many years?"
 		};
-
-		repeat_type.change(function() {
+		
+		// Change "repeat every" label accordingly
+		repeat_type.change(function() { 
 			var val=$(this).val();
 			if (val!='never')
 			{
@@ -37,17 +38,25 @@ App.modules.company.event = {
 				schedule_inputs.slideUp();
 		});
 
+		// Show time fields only on normal mode
 		time_type.change(function() {
 			if ($(this).val()=='normal') 
 				time_inputs.fadeIn();
 			else 
 				time_inputs.fadeOut();
+		}); 
+		
+		// When start date changed, set end date with same value
+		dt_start.eq(0).change(function() {
+			dt_end.eq(0).val($(this).val());
 		});
 		
-		dt_start.change(function() {
-			alert('test');
+		// When start time changed, end time will be start time +1 hour
+		dt_start.eq(1).change(function() {
+			var h=Date.parse($(this).val());
+			h.addHours(1);
+			dt_end.eq(1).val(h.toString("hh:mm tt").toLowerCase())
 		});
-		
 
 		time_type.change();
 		repeat_type.change();

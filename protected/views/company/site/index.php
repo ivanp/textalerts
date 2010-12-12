@@ -43,8 +43,10 @@ $this->portlets[] = array(
 <?php
 ob_start();
 ?>
+var offset=(new Date()).getTimezoneOffset();
+var events_url='<?php echo $this->createAbsoluteUrl('/calendar/events')?>?offset='+offset;
 $("#fullcalendar").fullCalendar({
-	events: "<?php echo $this->createAbsoluteUrl('/calendar/events')?>",
+	events: events_url,
 	header: {
 				left: 'prev,next today',
 				center: 'title',
