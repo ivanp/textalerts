@@ -72,6 +72,13 @@ $this->breadcrumbs=array(
 		<?php echo $form->labelEx($info,'bb_text'); ?>
 		<?php echo $form->textArea($info,'bb_text',array('rows'=>6, 'cols'=>60)); ?>
 	</div>
+	
+	<div class="row">
+		<?php $tz_data=CHtml::listData($time_zones,'id','text','group'); ?>
+		<?php echo $form->labelEx($info, 'time_zone'); ?>
+		<?php echo $form->dropDownList($info,'time_zone',$tz_data,array('prompt'=>'Select timezone:',
+				'class'=>'timezone-select')); ?> 
+	</div>
 
 	<div class="row">
 		<?php echo $form->labelEx($info,'img_logo'); ?>

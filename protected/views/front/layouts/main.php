@@ -9,6 +9,7 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="language" content="en" />
+	<meta name="description" content="My Church Alerts is designed to help small and large churches communicate effectively with their members using text messages and email. Church staff members can easily create groups (Women's Ministry, High School Parents, High School Students, Etc) and church members can easily subscribe to these groups."/>
 
 	<!-- blueprint CSS framework -->
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css" media="screen, projection" />

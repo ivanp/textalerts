@@ -26,7 +26,7 @@ class CompanyInfo extends CActiveRecord
 			array('bb_label','length','max'=>100),
 //			array('company_id', 'required', 'on'=>'insert'),
 			array('company_id', 'unsafe', 'on'=>'update'),
-			array('email_pass,use_eztext,eztext_user,eztext_pass,bb_text', 'safe'),
+			array('email_pass,use_eztext,eztext_user,eztext_pass,bb_text,time_zone', 'safe'),
 			array('email_from', 'email'),
 			array('img_logo', 'file', 'types'=>'jpg, gif, png','allowEmpty'=>true)
 		);
@@ -70,5 +70,38 @@ class CompanyInfo extends CActiveRecord
 	public function tableName()
 	{
 		return 'company_info';
+	}
+	
+	public function getTimezoneOptions()
+	{
+		$tzs=timezone_identifiers_list();
+		$time_zones=array();
+		$now=Zend_Date::now();
+		$codes=array();
+		foreach ($tzs as $zone) 
+		{
+			$now->setTimezone($zone);
+			$tz_code=$now->get(Zend_Date::TIMEZONE);
+			$tz_diff=$now->get(Zend_Date::GMT_DIFF_SEP);
+			$zinfo=explode('/',$zone);
+			// Get continent name
+			$continent=array_shift($zinfo);
+			// Get city name & tidy up
+			$city=str_replace('_',' ',array_pop($zinfo));
+			// Sorting stuff
+			$id=$tz_diff.'_'.$zone;
+			if (isset($time_zones[$id]))
+				$time_zones[$id]['text'].=','.$city;
+			else
+			{
+				$time_zones[$id]=array(
+					'id'=>$zone,
+					'text'=>sprintf('GMT%s %s',$tz_diff,$city),
+					'group'=>$continent
+				);
+			}
+		}
+		ksort($time_zones);
+		return $time_zones;
 	}
 }

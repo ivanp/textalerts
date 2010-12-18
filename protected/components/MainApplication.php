@@ -25,30 +25,38 @@ class MainApplication extends CWebApplication {
 
 		if (CONTROLLER_MODE == 'company')
 		{
-			$current_baseurl = $this->getRequest()->getHostInfo();
+			$request=$this->getRequest();
+			
+			$current_baseurl=$request->getHostInfo();
 			$pattern = '#(\w+)\.'. preg_quote($this->params['domain'], '#').'#i';
 			if (!preg_match($pattern, $current_baseurl, $result))
-				$this->getRequest()->redirect($this->createFrontUrl('site/invaliddomain'), true, 301);
+				$request->redirect($this->createFrontUrl('site/invaliddomain'), true, 301);
 
 			$host = $result[1];
 			if (in_array($host, $this->params['redirectHosts']))
-				$this->getRequest()->redirect($this->createFrontUrl('site/index'), true, 301);
+				$request->redirect($this->createFrontUrl('site/index'), true, 301);
 
 			$company = Company::model()->with('info')->find('host = :host', array(':host' => $host));
 			if ($company instanceof Company)
 				$this->_company = $company;
 			else
-				$this->getRequest()->redirect($this->createFrontUrl('site/invalidhost'), true, 302);
+				$request->redirect($this->createFrontUrl('site/invalidhost'), true, 302);
+			
+			if (($company->info->time_zone===null) || !@date_default_timezone_set($company->info->time_zone))
+				date_default_timezone_set($this->params['timezone']);
+		}
+		else
+		{
+			// Set default timezone
+			date_default_timezone_set($this->params['timezone']);
 		}
 
-//		$command = $this->db->createCommand('SET AUTOCOMMIT=0');
-//		$command->execute();
 
 		Yii::import("ext.yiiext.components.zendAutoloader.EZendAutoloader", true);
 		EZendAutoloader::$prefixes = array('Zend', 'Custom');
 		Yii::registerAutoloader(array("EZendAutoloader", "loadClass"));
 		
-		date_default_timezone_set($this->params['timezone']);
+		
 	}
 
 	public function createFrontUrl($route,$params=array(),$ampersand='&')

@@ -65,10 +65,11 @@ class CompanyController extends CCompanyController
 				$this->redirect($this->createUrl('company/settings'),true);
 			}
 		}
-
+		
 		$this->render('settings', array(
 			'company'	=> $company,
-			'info' => $info
+			'info' => $info,
+			'time_zones'=>$info->getTimezoneOptions()
 		));
 	}
 }

@@ -3,4 +3,7 @@
 /protected/tests
 /protected/data
 /protected/yiic
+/protected/vendors/Zend
+/protected/upload
+/temp
 *~

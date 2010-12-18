@@ -37,7 +37,7 @@ class SiteController extends CCompanyController
 		
 //		$company = Company::model()->findByPk(1);
 
-		
+//		throw new Exception('yada yada');
 		$this->render('index');
 
 		
@@ -53,7 +53,12 @@ class SiteController extends CCompanyController
 	    	if(Yii::app()->request->isAjaxRequest)
 	    		echo $error['message'];
 	    	else
+				{
+					if ($error['code']== 404)
+						$this->render('error404', $error);
+					else
 	        	$this->render('error', $error);
+				}
 	    }
 	}
 
@@ -80,12 +85,15 @@ class SiteController extends CCompanyController
 
 	public function actionTest()
 	{
-		date_default_timezone_set('America/Indiana/Indianapolis');
-		$dt = Zend_Date::now();
-
-//$dt->setTimezone('America/Indiana/Indianapolis');
-
-echo $dt;
-		
+		var_dump(@date_default_timezone_set('ahem'));
+//		$dt = Zend_Date::now();
+//		$dt->setTimezone('EST');
+//		var_dump($dt->get(Zend_Date::RFC_850));
+////
+//////$dt->setTimezone('America/Indiana/Indianapolis');
+////
+////echo $dt;
+//		//var_dump(timezone_identifiers_list());
+//		$this->render('test');
 	}
 }
