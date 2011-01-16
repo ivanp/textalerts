@@ -27,4 +27,11 @@ class MessageQueueCount extends CompanyActiveRecord
   PRIMARY KEY (`message_queue_id`) )
 ENGINE = MyISAM";
 	}
+
+	public function relations()
+	{
+		return array(
+			'queue'=>array(self::BELONGS_TO,$this->getCompanyClass('MessageQueue'),'message_queue_id')
+		);
+	}
 }

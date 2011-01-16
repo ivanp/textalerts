@@ -62,7 +62,7 @@ class SrbacModule extends CWebModule {
   /* @var $username String The username column of the users table*/
   public $username = "username";
   /* @var $userclass String The name of the users Class*/
-  public $userclass = "User";
+  public $userclass = "SuperAdmin";
   /* @var $superUser String The name of the superuser */
   public $superUser = "Authorizer";
   /* @var $css string The css to use */

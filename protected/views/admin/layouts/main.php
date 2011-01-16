@@ -1,6 +1,21 @@
 <?php
 
-
+if (!Yii::app()->user->isGuest)
+{
+	$menu = array(
+		array('label'=>'Home', 'url'=>$this->createUrl('/site/index')),
+		array('label'=>'Companies', 'url'=>$this->createUrl('/company/index')),
+		array('label'=>'Access Control', 'url'=>array('/srbac')),
+		array('label'=>'Logs', 'url'=>$this->createUrl('/log/index')),
+		array('label'=>sprintf('Logout (%s)', Yii::app()->user->username), 'url'=>$this->createUrl('/user/logout')),
+	);
+}
+else
+{
+	$menu = array(
+		array('label'=>'Login', 'url'=>$this->createUrl('/user/login'))
+	);
+}
 
 $cs = Yii::app()->clientScript;
 
@@ -27,7 +42,7 @@ $cs->registerScriptFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('w
     </div>
     <div id="nav">
     	<?php $this->widget('zii.widgets.CMenu',array(
-			'items'=>$this->menu
+			'items'=>$menu
 		));
 
 		?>

@@ -38,9 +38,9 @@ return CMap::mergeArray(
 		'modules'=>array(
 			'srbac'=>array(
 				'class'=>'application.modules.srbac.SrbacModule',
-				'userclass'=>'User', //default: User
+				'userclass'=>'SuperAdmin', //default: User
 				'userid'=>'id', //default: userid
-				'username'=>'email', //default:username
+				'username'=>'username', //default:username
 				'debug'=>true, //default :false
 				'pageSize'=>10, // default : 15
 				'superUser' =>'Authority', //default: Authorizer

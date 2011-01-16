@@ -438,7 +438,36 @@ ENGINE = MyISAM";
 			'recipients'=>array(self::MANY_MANY,get_class($groupModel),$msgGroupModel->tableName().'(message_id,group_id)'),
 			'logs'=>array(self::HAS_MANY,$this->getCompanyClass('MessageLog'),'message_id'),
 			'schedule'=>array(self::HAS_ONE,$this->getCompanyClass('MessageSchedule'),'message_id'),
+			'queues'=>array(self::HAS_MANY,$this->getCompanyClass('MessageQueue'),'message_id',
+					'order'=>'schedule_on')
 		);
+	}
+
+	/**
+	 * @return MessageQueue
+	 */
+	public function getLastRunningQueue()
+	{
+		$criteria=new CDbCriteria();
+		$criteria->limit=1;
+		$criteria->order='schedule_on DESC';
+		$criteria->condition='schedule_on < :timeNow';
+		$criteria->params=array(
+			':timeNow'=>time()
+		);
+		return MessageQueue::modelByCompany($this->company)->with('message_count')->find($criteria);
+	}
+
+	public function getNextRunningQueue()
+	{
+		$criteria=new CDbCriteria();
+		$criteria->limit=1;
+		$criteria->order='schedule_on ASC';
+		$criteria->condition='schedule_on > :timeNow';
+		$criteria->params=array(
+			':timeNow'=>time()
+		);
+		return MessageQueue::modelByCompany($this->company)->with('message_count')->find($criteria);
 	}
 
 	public function log($type,$message)

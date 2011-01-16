@@ -95,7 +95,7 @@ ENGINE = MyISAM";
 		);
 	}
 
-	public function rules()
+	public function rules() 
 	{
 		return array(
 			array('subject,time_type,repeat_type,start,end','required'),

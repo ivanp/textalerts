@@ -28,6 +28,7 @@ class UserController extends CCompanyController
 	public function actionIndex()
 	{
 		$criteria=new CDbCriteria();
+		$criteria->order='first_name, last_name, id';
 		$total_users=User::modelByCompany($this->company)->count($criteria);
 		$pages=new CPagination($total_users);
 		$pages->pageSize=20;

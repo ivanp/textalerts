@@ -85,7 +85,8 @@ class SiteController extends CCompanyController
 
 	public function actionTest()
 	{
-		var_dump(@date_default_timezone_set('ahem'));
+		var_dump(Yii::app()->user->checkAccess('ManageOwnCompany',array('company'=>$this->company)));
+		
 //		$dt = Zend_Date::now();
 //		$dt->setTimezone('EST');
 //		var_dump($dt->get(Zend_Date::RFC_850));

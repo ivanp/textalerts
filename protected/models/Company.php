@@ -9,7 +9,7 @@ class Company extends CActiveRecord
 
 	private $_createModel = array('User','PhoneNumber', 'Group','Subscription',
 			'StatusUpdate','Event','Occurrence',
-			'Message','MessageGroup','MessageLog','MessageSchedule','MessageQueue');
+			'Message','MessageGroup','MessageLog','MessageSchedule','MessageQueue','MessageQueueCount');
 
 	public static function model($className=__CLASS__)
 	{

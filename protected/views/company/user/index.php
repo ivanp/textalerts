@@ -23,7 +23,7 @@ $this->breadcrumbs=array(
 		<tr>
 			<td>
 				<?php
-				echo CHtml::link(CHtml::encode($user->getDisplayName()), $user->createViewUrl());
+				echo CHtml::link(CHtml::encode($user->getDisplayName()), $this->createUrl('user/profile',array('id'=>$user->id)));
 				?>
 			</td>
 			<td>

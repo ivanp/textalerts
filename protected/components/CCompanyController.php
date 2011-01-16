@@ -44,10 +44,11 @@ class CCompanyController extends Controller
 		$this->menu = array(
 				array('label'=>'Home', 'url'=>array('site/index')),
 //				array('label'=>'Dashboard', 'url'=>array('site/dashboard'), 'visible'=>!Yii::app()->user->isGuest),
+				array('label'=>'Users', 'url'=>array('user/index'), 'visible'=>$isAdmin),
 				array('label'=>'Groups', 'url'=>array('group/index'), 'visible'=>$isSender),
 				array('label'=>'Messages', 'url'=>array('message/index'), 'visible'=>($isAdmin || $isSender)),
 				//array('label'=>'Send Alert', 'url'=>array('message/create'), 'visible'=>($isAdmin || $isSender)),
-				array('label'=>'Community Calendar', 'url'=>array('calendar/index'), 'visible'=>!Yii::app()->user->isGuest),
+				array('label'=>'Calendar', 'url'=>array('calendar/index'), 'visible'=>!Yii::app()->user->isGuest),
 				array('label'=>'Settings', 'url'=>array('company/settings'), 'visible'=>$isAdmin),
 				array('label'=>'Login', 'url'=>array('user/login'), 'visible'=>Yii::app()->user->isGuest),
 				array('label'=>'Register', 'url'=>array('user/register'), 'visible'=>Yii::app()->user->isGuest),
