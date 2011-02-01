@@ -16,7 +16,7 @@
                     <param name="allowfullscreen" value="true" />
                     <param name="scale" value="showall" />
                     <param name="allowscriptaccess" value="always" />
-                    <param name="flashvars" value="thumb=media/FirstFrame.png&containerwidth=496&containerheight=480&content=myalerts.mp4&autostart=false&blurover=false&autohide=true&smoothing=true&showbranding=false&showstartscreen=true&color=0x1A1A1A,0x1A1A1A" />
+                    <param name="flashvars" value="thumb=/media/FirstFrame.png&containerwidth=496&containerheight=480&content=myalerts.mp4&autostart=false&blurover=false&autohide=true&smoothing=true&showbranding=false&showstartscreen=true&color=0x1A1A1A,0x1A1A1A" />
                 <!--<![endif]-->
                     <div id="noUpdate">
                         <p>This page requires Adobe Flash Player. <a href="http://www.adobe.com/go/getflashplayer">downloading here</a>.</p>
@@ -35,7 +35,7 @@
                 <param name="allowScriptAccess" value="always"/>
                 <param name="allowFullScreen" value="true"/>
                 <param name="scale" value="showall"/>
-                <param name="flashVars" value="thumb=media/FirstFrame.png&containerwidth=978&containerheight=947&content=myalerts.mp4&autostart=false&blurover=false&autohide=true&smoothing=true&showbranding=false&showstartscreen=true"/>
+                <param name="flashVars" value="thumb=/media/FirstFrame.png&containerwidth=978&containerheight=947&content=myalerts.mp4&autostart=false&blurover=false&autohide=true&smoothing=true&showbranding=false&showstartscreen=true"/>
                 <embed name="csSWF" src="/media/player.swf" width="496" height="480" bgcolor="#1a1a1a" quality="best" allowScriptAccess="always" allowFullScreen="true" scale="showall" flashVars="thumb=media/FirstFrame.png&containerwidth=978&containerheight=947&content=myalerts.mp4&autostart=false&blurover=false&autohide=true&smoothing=true&showbranding=false&showstartscreen=true&color=0x1A1A1A,0x1A1A1A" pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></embed>
             </object>
         </div>
