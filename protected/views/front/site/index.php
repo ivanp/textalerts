@@ -16,7 +16,7 @@
                 <param name="allowscriptaccess" value="always" />
                 <param name="flashvars" value="thumb=media/FirstFrame.png&containerwidth=496&containerheight=480&content=myalerts.mp4&autostart=false&blurover=false&autohide=true&smoothing=true&showbranding=false&showstartscreen=true&color=0x1A1A1A,0x1A1A1A" />
                 <!--[if !IE]>-->
-                <object type="application/x-shockwave-flash" data="media/player.swf" width="496" height="480">
+                <object type="application/x-shockwave-flash" data="/media/player.swf" width="496" height="480">
                     <param name="quality" value="best" />
                     <param name="bgcolor" value="#1a1a1a" />
                     <param name="allowfullscreen" value="true" />
