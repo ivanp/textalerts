@@ -17,6 +17,8 @@ class CFrontController extends Controller
 				array('label'=>'Home', 'url'=>array('site/index')),
 				array('label'=>'About', 'url'=>array('/site/page', 'view'=>'about')),
 				array('label'=>'Contact', 'url'=>array('/site/contact')),
+				array('label'=>'Demo', 'url'=>array('/site/page', 'view'=>'demo')),
+				array('label'=>'Sign Up', 'url'=>array('/site/page', 'view'=>'paypal')),
 //				array('label'=>'Dashboard', 'url'=>array('site/dashboard'), 'visible'=>!Yii::app()->user->isGuest),
 //				array('label'=>'Login', 'url'=>array('/user/login'), 'visible'=>Yii::app()->user->isGuest),
 //				array('label'=>'Register', 'url'=>array('/user/register'), 'visible'=>Yii::app()->user->isGuest),
