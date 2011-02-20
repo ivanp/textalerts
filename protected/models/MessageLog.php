@@ -2,6 +2,9 @@
 
 class MessageLog extends CompanyActiveRecord
 {
+	const LogTypeError='error';
+	const LogTypeInfo='info';
+
 	public static function baseTableName()
 	{
 		return 'message_log';
@@ -9,7 +12,7 @@ class MessageLog extends CompanyActiveRecord
 
 	public static function createSqlByCompany(Company $company)
 	{
-		$tableName = self::tableNameByCompany($company, self::baseTableName());
+		$tableName=self::tableNameByCompany($company, self::baseTableName());
 		return "CREATE TABLE IF NOT EXISTS $tableName (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `message_id` BIGINT UNSIGNED NOT NULL ,
@@ -32,7 +35,15 @@ ENGINE = MyISAM";
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'message' => array(self::BELONGS_TO, $this->getCompanyClass('Message'), 'message_id'),
+			'message'=>array(self::BELONGS_TO, $this->getCompanyClass('Message'),'message_id'),
 		);
+	}
+
+	static public function addLog($message, $type) {
+		$log=new MessageLog();
+		$log->time=time();
+		$log->type=$type;
+		$log->body=$message;
+		return $log->save();
 	}
 }
