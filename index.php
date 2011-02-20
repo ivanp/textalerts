@@ -1,6 +1,6 @@
 <?php
-define('HOSTNAME_MAIN', 'textalert.local');
-define('HOSTNAME_ADMIN', 'admin.textalert.local');
+define('HOSTNAME_MAIN', 'homeduck.com');
+define('HOSTNAME_ADMIN', 'admin.homeduck.com');
 
 // Yii main script
 $yii=dirname(__FILE__).'/../yii/yii.php';
