@@ -163,7 +163,7 @@ class UserController extends CCompanyController
 				$mail->setBodyHtml($content);
 				$mail->setFrom($this->company->info->email_from);
 				$mail->addTo($user->email, $user->getDisplayName());
-				$mail->setSubject('Password recovery on homeduck.com');
+				$mail->setSubject('Password recovery on mychurchalerts.com');
 				$mail->send();
 
 				$this->render('forgotpassword_complete');
