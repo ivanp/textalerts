@@ -12,7 +12,6 @@ class CompanyController extends CAdminController
 	
 	public function actionCreate()
 	{
-
 		try
 		{
 			$company = new Company();
@@ -40,12 +39,13 @@ class CompanyController extends CAdminController
 					));
 					$this->redirect(array('company/index'), true);
 					$transaction->commit();
+					MessageLog::addLog(sprintf('User %s created '), MessageLog::LogTypeInfo);
 				}
 				else
 					$transaction->rollBack();
 			}
 		}
-		catch (CDbExceptiosn $e)
+		catch (CDbException $e)
 		{
 			$transaction->rollBack();
 			$company->addError('db', $e->getMessage());
